@@ -53,3 +53,19 @@
   }
 }
 ```
+## Query Avanzate
+* Filtraggio (GET) : <br>
+```json
+{
+}
+```
+* Unione (GET) : <br>
+```json
+{
+}
+```
+* Ordinamento (GET, PATCH, POST) : <br>
+```json
+{
+}
+```
