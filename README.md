@@ -18,6 +18,7 @@ The main functionalities of the API are: <br>
 |Quering files|
 |Provide statistic of the file system usage|
 |Provide info about who, and when, has changed files or query them|
+|File sharing|
 
 <br>
 Query Format: <br>
