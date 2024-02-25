@@ -6,7 +6,7 @@
 
 RenzoFS is distributed file system with a web based interface that allows user to see their remote file system and query their file, using json written query. <br>
 <br>
-The backend is written in Go (1.20) and uses RESTful API to interact with the web server, specially with the remote file system, wich is accessed by client only on remote access model, instead of upload-download access model. <br>
+The backend is written in Go (1.20) and uses RESTful API to interact with the web server, specially with the remote file system, witch is accessed by client only on remote access model, instead of upload-download access model. <br>
 The main functionalities of the API are: <br>
 |Functionality|
 |-------------|
@@ -15,9 +15,9 @@ The main functionalities of the API are: <br>
 |Add user's friend|
 |Create a remote directory|
 |Create empty csv files|
-|Quering files|
-|Provide statistic of the file system usage|
-|Provide info about who, and when, changed files or queried them|
+|Query the files|
+|Release file system usage statistics|
+|Provide info about who, and when, queried files|
 |File sharing|
 
 <br>
@@ -94,6 +94,6 @@ Advanced Query: <br>
 ```
 
 Future changes : <br>
-* Implementing a Microservices archiecture
-* Implementing a Cluster-based file storage system
-* Implementing Data Consistency
+* Implementing a Microservices architecture;
+* Implementing a Cluster-based file storage system;
+* Implementing Data Consistency.
