@@ -96,4 +96,4 @@ Advanced Query: <br>
 Future changes : <br>
 * Implementing a Microservices architecture;
 * Implementing a Cluster-based file storage system;
-* Implementing Data Consistency.
+* Implementing an Eventual Consistency system, based on a followe-leader architecture.
