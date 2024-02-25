@@ -4,7 +4,7 @@
 ![Diagramma senza titolo drawio](https://github.com/Elia-Renzoni/RenzoFS/assets/118525453/3cd2ba5c-f996-4379-98b5-5c254a446978)
 <br>
 
-RenzoFS is distributed file system with a web based interface that allows user to see their remote file system and query their file, using json written query. <br>
+RenzoFS is a distributed file system with a web based interface that allows users to see their remote file system and query their file, using json written query. <br>
 <br>
 The backend is written in Go (1.20) and uses RESTful API to interact with the web server, specially with the remote file system, witch is accessed by client only on remote access model, instead of upload-download access model. <br>
 The main functionalities of the API are: <br>
