@@ -85,6 +85,18 @@ Advanced Query: <br>
 * Unione (GET) : <br>
 ```json
 {
+  "query_type": "select",
+  "destination": "myFile",
+  "query_content": {
+    "field1": "value",
+    "field2": "all_items",
+    "filed3": 23
+  },
+  "union":{
+    "destination": "myFile2",
+    "field1": "value",
+    "field2": 233
+  }
 }
 ```
 * Ordinamento (GET, PATCH, POST) : <br>
