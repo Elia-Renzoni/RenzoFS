@@ -77,7 +77,7 @@ Query Format: <br>
 }
 ```
 Advanced Query: <br>
-* Filtraggio (GET) : 
+* Filtering (GET) : 
 ```json
 {
   "query_type": "select",
@@ -110,7 +110,7 @@ Advanced Query: <br>
 |min_length|
 |max_length|
 |length_between|
-* Unione (GET) : <br>
+* Union (GET) : <br>
 ```json
 {
   "query_type": "select",
@@ -127,7 +127,7 @@ Advanced Query: <br>
   }
 }
 ```
-* Ordinamento (GET, PATCH, POST) : <br>
+* Sorting (GET, PATCH, POST) : <br>
 ```json
 {
   "sort_asc": true,
