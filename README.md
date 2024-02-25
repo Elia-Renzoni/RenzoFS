@@ -17,7 +17,7 @@ The main functionalities of the API are: <br>
 |Create empty csv files|
 |Quering files|
 |Provide statistic of the file system usage|
-|Provide info about who, and when, changed files or query them|
+|Provide info about who, and when, changed files or queried them|
 |File sharing|
 
 <br>
