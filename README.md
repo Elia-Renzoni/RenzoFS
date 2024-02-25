@@ -93,4 +93,7 @@ Advanced Query: <br>
 }
 ```
 
- 
+Future changes : <br>
+* Implementing a Microservices archiecture
+* Implementing a Cluster-based file storage system
+* Implementing Data Consistency
