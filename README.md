@@ -130,6 +130,8 @@ Advanced Query: <br>
 * Ordinamento (GET, PATCH, POST) : <br>
 ```json
 {
+  "sort_asc": true,
+  "sort_desc": true
 }
 ```
 
