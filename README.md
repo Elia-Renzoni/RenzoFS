@@ -80,8 +80,36 @@ Advanced Query: <br>
 * Filtraggio (GET) : 
 ```json
 {
+  "query_type": "select",
+  "destination": "myFile",
+  "query_content": {
+    "field1": "example1",
+    "field2": "example2",
+    "field3": "example3",
+    "field4": {
+      "between": [30, 40]
+    },
+    "field5": {
+      "max": 50
+    },
+    "field6": {
+      "min": 30
+    },
+    "field7": {
+      "word_length": 60
+    }
+  }
 }
 ```
+|Instructions|
+|------------|
+|between|
+|max|
+|min|
+|length|
+|min_length|
+|max_length|
+|length_between|
 * Unione (GET) : <br>
 ```json
 {
