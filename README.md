@@ -27,6 +27,7 @@ Query Format: <br>
 ```json
 {
   "query_type": "insert",
+  "user_name":"elia",
   "destination": "myFile",
   "query_content": [
     "example1",
@@ -43,6 +44,7 @@ Query Format: <br>
 ```json
 {
   "query_type": "select",
+  "user_name":"elia",
   "destination": "myFile",
   "query_content": {
     "field1": "value",
@@ -55,6 +57,7 @@ Query Format: <br>
 ```json
 {
   "query_type": "update",
+  "user_name":"elia",
   "destination": "myFile",
   "to_update": [
     "field1", "field2", "field3"
@@ -68,6 +71,7 @@ Query Format: <br>
 ```json
 {
   "query_type": "delete",
+  "user_name":"elia",
   "destination": "myFile",
   "query_content": {
     "field1": "all_items",
@@ -81,6 +85,7 @@ Advanced Query: <br>
 ```json
 {
   "query_type": "select",
+  "user_name":"elia",
   "destination": "myFile",
   "query_content": {
     "field1": "example1",
@@ -114,6 +119,7 @@ Advanced Query: <br>
 ```json
 {
   "query_type": "select",
+  "user_name":"elia",
   "destination": "myFile",
   "query_content": {
     "field1": "value",
