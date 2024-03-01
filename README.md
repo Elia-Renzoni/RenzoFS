@@ -56,12 +56,11 @@ Query Format: <br>
   "query_type": "update",
   "user_name":"elia",
   "destination": "myFile",
-  "to_update": [
-    "field1", "field2", "field3"
-  ],
-  "new_values": [
-    "example1", "example2", "example3"
-  ]
+  "query_content": {
+    "field1": "value",
+    "field2": [44, 6],
+    "field3": 33.0
+  }  
 }
 ```
 * Delete (DELETE): <br>
