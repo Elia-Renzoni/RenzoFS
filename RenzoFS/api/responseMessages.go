@@ -15,6 +15,7 @@ const (
 	okMessage        string = "Good Request, Good Parameters"
 	dirException     string = "Directory not exitst, create a new one"
 	fileException    string = "File not exist, create a new one"
+	POSTokMessage    string = "Added query content"
 )
 
 const (
@@ -51,5 +52,12 @@ func (r *ResponseMessages) MarshallFileException() (jsonErrMessage []byte, err e
 	r.ErrMessage = make(map[string]string)
 	r.ErrMessage[errorMessage] = fileException
 	jsonErrMessage, err = json.Marshal(r.ErrMessage)
+	return
+}
+
+func (r *ResponseMessages) MarshallPOSTSuccess() (jsonPOSTSuccessMessage []byte, err error) {
+	r.OkMessage = make(map[string]string)
+	r.OkMessage[okMessage] = POSTokMessage
+	jsonPOSTSuccessMessage, err = json.Marshal(r.OkMessage)
 	return
 }

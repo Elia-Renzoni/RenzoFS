@@ -13,15 +13,16 @@ import (
 )
 
 type InsertPayLoad struct {
-	User         string                 `json:"user"`
-	FileName     string                 `json:"file_name"`
-	QueryContent map[string]interface{} `json:"query_content"`
+	User         string              `json:"user"`
+	FileName     string              `json:"file_name"`
+	QueryContent map[string][]string `json:"query_content"`
 }
 
 var (
-	payload    InsertPayLoad      = InsertPayLoad{}
-	errMessage ResponseMessages   = ResponseMessages{}
-	controller ResourceController = ResourceController{}
+	payload        InsertPayLoad      = InsertPayLoad{}
+	errMessage     ResponseMessages   = ResponseMessages{}
+	controller     ResourceController = ResourceController{}
+	fileOperations FileOp             = FileOp{}
 )
 
 func HandleInsertion(w http.ResponseWriter, r *http.Request) {
@@ -37,6 +38,7 @@ func HandleInsertion(w http.ResponseWriter, r *http.Request) {
 		if jsonMessage, _ := parseJSONQuery(); jsonMessage != nil {
 			writeNegativeJSONResponse(w, jsonMessage)
 		}
+		insertQueryValuesToCSV()
 	}
 }
 
@@ -56,15 +58,17 @@ func writeNegativeJSONResponse(w http.ResponseWriter, jsonMessage []byte) {
 	w.Write(jsonMessage)
 }
 
-func writeAcceptedJSONResponse(w http.ResponseWriter) {
+func writeSuccessJSONResponse(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusAccepted)
 	w.Header().Set("Content-Type", "application/json")
-	json, _ := errMessage.MarshallOkMessage()
+	json, _ := errMessage.MarshallPOSTSuccess()
 	w.Write(json)
 }
 
 func insertQueryValuesToCSV() {
-
+	// lock
+	fileOperations.writeCSV(payload.FileName, payload.QueryContent)
+	// unlock
 }
 
 /*
