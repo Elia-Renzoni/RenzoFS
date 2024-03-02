@@ -8,7 +8,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -19,10 +18,13 @@ type InsertPayLoad struct {
 	QueryContent map[string]interface{} `json:"query_content"`
 }
 
-var payload InsertPayLoad = InsertPayLoad{}
+var (
+	payload    InsertPayLoad      = InsertPayLoad{}
+	errMessage ResponseMessages   = ResponseMessages{}
+	controller ResourceController = ResourceController{}
+)
 
 func HandleInsertion(w http.ResponseWriter, r *http.Request) {
-	var errMessage ResponseMessages = ResponseMessages{}
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Header().Set("Content-Type", "application/json")
@@ -32,13 +34,40 @@ func HandleInsertion(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		reqBody, _ := ioutil.ReadAll(r.Body)
 		json.Unmarshal(reqBody, &payload)
-		w.WriteHeader(http.StatusAccepted)
-		w.Header().Set("Content-Type", "text/plain")
-		w.Write([]byte("OK"))
+		if jsonMessage, _ := parseJSONQuery(); jsonMessage != nil {
+			writeNegativeJSONResponse(w, jsonMessage)
+		}
 	}
-	printContent()
 }
 
+func parseJSONQuery() ([]byte, error) {
+	if result := controller.checkDir(payload.User); result {
+		return errMessage.MarshallDirException()
+	}
+	if result := controller.checkFile(payload.FileName); result {
+		return errMessage.MarshallFileException()
+	}
+	return nil, nil
+}
+
+func writeNegativeJSONResponse(w http.ResponseWriter, jsonMessage []byte) {
+	w.WriteHeader(http.StatusNotAcceptable)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonMessage)
+}
+
+func writeAcceptedJSONResponse(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusAccepted)
+	w.Header().Set("Content-Type", "application/json")
+	json, _ := errMessage.MarshallOkMessage()
+	w.Write(json)
+}
+
+func insertQueryValuesToCSV() {
+
+}
+
+/*
 func printContent() {
 	fmt.Printf("User : %s\n", payload.User)
 	fmt.Printf("FileName: %s\n", payload.FileName)
@@ -53,4 +82,4 @@ func printContent() {
 			fmt.Printf("Value: %f", eff)
 		}
 	}
-}
+}*/

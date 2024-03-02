@@ -8,10 +8,17 @@ package api
 
 import "encoding/json"
 
+// error and exceptions
 const (
 	methodNotAllowed string = "The Method is not allowed for the specific call"
 	invalidParameter string = "Invalid query parameter, check again and send back"
 	okMessage        string = "Good Request, Good Parameters"
+	dirException     string = "Directory not exitst, create a new one"
+	fileException    string = "File not exist, create a new one"
+)
+
+const (
+	errorMessage, fineMessage string = "err_message", "ok_message"
 )
 
 type ResponseMessages struct {
@@ -21,14 +28,28 @@ type ResponseMessages struct {
 
 func (r *ResponseMessages) MarshallErrMessage() (jsonErrMessage []byte, err error) {
 	r.ErrMessage = make(map[string]string)
-	r.ErrMessage["err_message"] = methodNotAllowed
+	r.ErrMessage[errorMessage] = methodNotAllowed
 	jsonErrMessage, err = json.Marshal(r.ErrMessage)
 	return
 }
 
 func (r *ResponseMessages) MarshallOkMessage() (jsonOkMessage []byte, err error) {
 	r.OkMessage = make(map[string]string)
-	r.OkMessage["ok_message"] = okMessage
+	r.OkMessage[fineMessage] = okMessage
 	jsonOkMessage, err = json.Marshal(r.OkMessage)
+	return
+}
+
+func (r *ResponseMessages) MarshallDirException() (jsonErrMessage []byte, err error) {
+	r.ErrMessage = make(map[string]string)
+	r.ErrMessage[errorMessage] = dirException
+	jsonErrMessage, err = json.Marshal(r.ErrMessage)
+	return
+}
+
+func (r *ResponseMessages) MarshallFileException() (jsonErrMessage []byte, err error) {
+	r.ErrMessage = make(map[string]string)
+	r.ErrMessage[errorMessage] = fileException
+	jsonErrMessage, err = json.Marshal(r.ErrMessage)
 	return
 }
