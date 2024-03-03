@@ -29,11 +29,7 @@ Query Format: <br>
   "query_type": "insert",
   "user_name":"elia",
   "destination": "myFile",
-  "query_content": {
-      "field1": "value",
-      "field2": [34.0, 67, 8],
-      "filed3": 23
-  }
+  "query_content": ["value1", "44", "value2", "55.5"]
 }
 ```
 
