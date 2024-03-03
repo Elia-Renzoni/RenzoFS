@@ -16,5 +16,5 @@ func main() {
 	handle := http.NewServeMux()
 	handle.HandleFunc("/insert", api.HandleInsertion)
 
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8080", handle)
 }

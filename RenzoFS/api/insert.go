@@ -7,47 +7,49 @@
 package api
 
 import (
+	"encoding/csv"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"os"
 )
 
 type InsertPayLoad struct {
-	User         string              `json:"user"`
-	FileName     string              `json:"file_name"`
-	QueryContent map[string][]string `json:"query_content"`
+	User         string   `json:"user"`
+	FileName     string   `json:"file_name"`
+	QueryContent []string `json:"query_content"`
 }
 
 var (
-	payload        InsertPayLoad      = InsertPayLoad{}
-	errMessage     ResponseMessages   = ResponseMessages{}
-	controller     ResourceController = ResourceController{}
-	fileOperations FileOp             = FileOp{}
+	payload    InsertPayLoad      = InsertPayLoad{}
+	errMessage ResponseMessages   = ResponseMessages{}
+	controller ResourceController = ResourceController{}
 )
 
 func HandleInsertion(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Header().Set("Content-Type", "application/json")
-		json, _ := errMessage.MarshallErrMessage()
+		json, _ := errMessage.MarshalErrMessage(0)
 		w.Write(json)
 	} else {
 		defer r.Body.Close()
-		reqBody, _ := ioutil.ReadAll(r.Body)
+		reqBody, _ := io.ReadAll(r.Body)
 		json.Unmarshal(reqBody, &payload)
 		if jsonMessage, _ := parseJSONQuery(); jsonMessage != nil {
 			writeNegativeJSONResponse(w, jsonMessage)
 		}
-		insertQueryValuesToCSV()
+		writeInRemoteCSVFile()
+		writeSuccessJSONResponse(w)
 	}
 }
 
 func parseJSONQuery() ([]byte, error) {
 	if result := controller.checkDir(payload.User); result {
-		return errMessage.MarshallDirException()
+		return errMessage.MarshalErrMessage(3)
 	}
 	if result := controller.checkFile(payload.FileName); result {
-		return errMessage.MarshallFileException()
+		return errMessage.MarshalErrMessage(4)
 	}
 	return nil, nil
 }
@@ -61,29 +63,20 @@ func writeNegativeJSONResponse(w http.ResponseWriter, jsonMessage []byte) {
 func writeSuccessJSONResponse(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusAccepted)
 	w.Header().Set("Content-Type", "application/json")
-	json, _ := errMessage.MarshallPOSTSuccess()
+	json, _ := errMessage.MarshalSuccessMessage(5)
 	w.Write(json)
 }
 
-func insertQueryValuesToCSV() {
-	// lock
-	fileOperations.writeCSV(payload.FileName, payload.QueryContent)
-	// unlock
-}
+func writeInRemoteCSVFile() {
+	file, err := os.Open("renzofs_local_file_system/" + payload.User + "/" + payload.FileName)
 
-/*
-func printContent() {
-	fmt.Printf("User : %s\n", payload.User)
-	fmt.Printf("FileName: %s\n", payload.FileName)
-	for key, value := range payload.QueryContent {
-		fmt.Printf("Key : %s", key)
-		switch eff := value.(type) {
-		case string:
-			fmt.Printf("Value : %s", eff)
-		case int:
-			fmt.Printf("Value : %d", eff)
-		case float64:
-			fmt.Printf("Value: %f", eff)
-		}
+	if err != nil {
+		panic(err)
 	}
-}*/
+
+	writer := csv.NewWriter(file)
+	if errOnWrite := writer.Write(payload.QueryContent); errOnWrite != nil {
+		panic(err)
+	}
+
+}
