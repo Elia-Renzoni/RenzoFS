@@ -15,6 +15,7 @@ import (
 type ResourceController struct {
 }
 
+// UPDATED
 func (r *ResourceController) checkDir(name string) (result bool) {
 	if dirInfo, err := os.Stat(name); dirInfo.isDir() {
 		result = true
