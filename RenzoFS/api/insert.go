@@ -9,7 +9,9 @@ package api
 import (
 	"encoding/csv"
 	"encoding/json"
+	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 )
@@ -37,22 +39,8 @@ func HandleInsertion(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		reqBody, _ := io.ReadAll(r.Body)
 		json.Unmarshal(reqBody, &payload)
-		if jsonMessage, _ := parseJSONQuery(); jsonMessage != nil {
-			writeNegativeJSONResponse(w, jsonMessage)
-		}
-		writeInRemoteCSVFile()
-		writeSuccessJSONResponse(w)
+		writeInRemoteCSVFile(w)
 	}
-}
-
-func parseJSONQuery() ([]byte, error) {
-	if result := controller.checkDir(payload.User); result {
-		return errMessage.MarshalErrMessage(3)
-	}
-	if result := controller.checkFile(payload.FileName); result {
-		return errMessage.MarshalErrMessage(4)
-	}
-	return nil, nil
 }
 
 func writeNegativeJSONResponse(w http.ResponseWriter, jsonMessage []byte) {
@@ -68,16 +56,24 @@ func writeSuccessJSONResponse(w http.ResponseWriter) {
 	w.Write(json)
 }
 
-func writeInRemoteCSVFile() {
-	file, err := os.Open("renzofs_local_file_system/" + payload.User + "/" + payload.FileName)
-
+func writeInRemoteCSVFile(w http.ResponseWriter) {
+	file, err := os.OpenFile("elia.csv", os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
-		panic(err)
+		jsonErr, _ := errMessage.MarshalErrMessage(4)
+		writeNegativeJSONResponse(w, jsonErr)
+		log.Fatal(err)
 	}
+	defer file.Close()
+	defer func() {
+		for _, value := range payload.QueryContent {
+			fmt.Printf("Value : %v", value)
+		}
+	}()
 
 	writer := csv.NewWriter(file)
+	defer writer.Flush()
 	if errOnWrite := writer.Write(payload.QueryContent); errOnWrite != nil {
 		panic(err)
 	}
-
+	writeSuccessJSONResponse(w)
 }
