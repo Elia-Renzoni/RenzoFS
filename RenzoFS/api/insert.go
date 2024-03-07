@@ -14,6 +14,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
 type InsertPayLoad struct {
@@ -57,18 +58,30 @@ func writeSuccessJSONResponse(w http.ResponseWriter) {
 }
 
 func writeInRemoteCSVFile(w http.ResponseWriter) {
-	file, err := os.OpenFile("elia.csv", os.O_WRONLY|os.O_CREATE, 0644)
+	for {
+		if err := os.Chdir(filepath.Join("local_file_system", payload.User)); err != nil {
+			if os.IsNotExist(err) {
+				controller.createNewDir(payload.User)
+				fmt.Printf("directory creata")
+			}
+		} else {
+			break
+		}
+	}
+
+	file, err := os.OpenFile(payload.FileName, os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		jsonErr, _ := errMessage.MarshalErrMessage(4)
 		writeNegativeJSONResponse(w, jsonErr)
 		log.Fatal(err)
+
+		// if the file dont exist
+		if os.IsNotExist(err) {
+			jsonErr, _ := errMessage.MarshalErrMessage(4)
+			writeNegativeJSONResponse(w, jsonErr)
+		}
 	}
 	defer file.Close()
-	defer func() {
-		for _, value := range payload.QueryContent {
-			fmt.Printf("Value : %v", value)
-		}
-	}()
 
 	writer := csv.NewWriter(file)
 	defer writer.Flush()

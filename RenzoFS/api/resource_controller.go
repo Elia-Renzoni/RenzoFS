@@ -10,13 +10,14 @@ package api
 import (
 	"log"
 	"os"
+	"path/filepath"
 )
 
 type ResourceController struct {
 }
 
 func (r *ResourceController) createNewDir(dirname string) {
-	if err := os.MkdirAll("renzofs_local_file_system/"+dirname, os.ModeDir); err != nil {
+	if err := os.Mkdir(filepath.Join("local_file_system", dirname), os.ModeDir); err != nil {
 		log.Fatal(err)
 	}
 }
