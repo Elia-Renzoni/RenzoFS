@@ -15,6 +15,11 @@ import (
 func main() {
 	handle := http.NewServeMux()
 	handle.HandleFunc("/insert", api.HandleInsertion)
+	/*handle.HandleFunc("/read", api.HandleRead)
+	handle.HandleFunc("/update", api.HandleUpdate)
+	handle.HandleFunc("/delete", api.HandleDelete)
+	handle.HandleFunc("/delete/dir", api.HandleDirElimination)
+	handle.HandleFunc("/create/dir", api.HandleDirCreation)*/
 
 	http.ListenAndServe(":8080", handle)
 }

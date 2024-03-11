@@ -11,9 +11,10 @@ import (
 )
 
 const (
-	errorMessage, succMessage string = "err_message", "ok_message"
+	errorMessage, succMessage string = "err_message", "success_message"
 )
 
+// errot types enumeration
 const (
 	methodNotAllowed byte = iota
 	invalidParameter
