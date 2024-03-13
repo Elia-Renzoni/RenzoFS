@@ -8,6 +8,7 @@
 package api
 
 import (
+	"encoding/csv"
 	"log"
 	"os"
 	"path/filepath"
@@ -16,17 +17,89 @@ import (
 type ResourceController struct {
 }
 
+var resourceControllerInstace *ResourceController
+
+// crud operations
+const (
+	insert string = "insert"
+	update string = "update"
+	delete string = "delete"
+	read   string = "read"
+)
+
+// singleton pattern
+func getResourceControllerInstance() *ResourceController {
+	if resourceControllerInstace == nil {
+		return new(ResourceController)
+	}
+	return resourceControllerInstace
+}
+
 func (r *ResourceController) createNewDir(dirname string) {
 	if err := os.Mkdir(filepath.Join("local_file_system", dirname), os.ModeDir); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (r *ResourceController) createNewFile(filename string) (*os.File, error) {
-	if file, err := os.OpenFile(filename, os.O_CREATE, 0644); err != nil {
-		log.Fatal(err)
-	} else {
-		return file, err
+// function to call when the client need to
+// - READ
+// - DELETE
+// - INSERT
+// - UPDATE
+// information in files
+// @param dir of the local file system - username
+// @param file name
+// @param id of the CRUD operation
+// @param query content
+func (r *ResourceController) RemoteCSVFile(dir string, filename string, queryType string, query []string) error {
+	var err error
+	switch queryType {
+	case insert:
+		err = writeRemoteCSV(dir, filename, query)
+	case read:
+		err = readInRemoteCSV(dir, filename, query)
+	case update:
+		err = updateRemoteCSV(dir, filename, query)
+	case delete:
+		err = deleteRemoteCSV(dir, filename, query)
 	}
-	return nil, nil
+	return err
+}
+
+func writeRemoteCSV(dir, filename string, query []string) error {
+	for {
+		// change work directory to local_file_system + user dir
+		if err := os.Chdir(filepath.Join("local_file_system", dir)); err != nil {
+			return err
+		} else {
+			break
+		}
+	}
+
+	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close() // defer-close pattern
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+	if err := writer.Write(query); err != nil {
+		return err
+	}
+	return nil
+}
+
+// TODO
+func readInRemoteCSV(dir, filename string, query []string) error {
+	return nil
+}
+
+// TODO
+func updateRemoteCSV(dir, filename string, query []string) error {
+	return nil
+}
+
+// TODO
+func deleteRemoteCSV(dir, filename string, query []string) error {
+	return nil
 }

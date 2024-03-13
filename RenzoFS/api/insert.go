@@ -7,14 +7,9 @@
 package api
 
 import (
-	"encoding/csv"
 	"encoding/json"
-	"fmt"
 	"io"
-	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 )
 
 type InsertPayLoad struct {
@@ -22,71 +17,56 @@ type InsertPayLoad struct {
 	User         string   `json:"user"`
 	FileName     string   `json:"file_name"`
 	QueryContent []string `json:"query_content"`
+	messages     *ResponseMessages
+	resources    *ResourceController
 }
 
-var (
-	payload    InsertPayLoad      = InsertPayLoad{}
-	errMessage ResponseMessages   = ResponseMessages{}
-	controller ResourceController = ResourceController{}
-)
-
-func HandleInsertion(w http.ResponseWriter, r *http.Request) {
+// handle the request
+func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) {
+	payload := new(InsertPayLoad)
+	i.messages = getInstance()
+	i.resources = getResourceControllerInstance()
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Header().Set("Content-Type", "application/json")
-		json, _ := errMessage.MarshalErrMessage(0)
-		w.Write(json)
+		json, err := i.messages.MarshalErrMessage(0)
+		if err != nil {
+			writeServerErrorJSONResponse(w, json)
+		} else {
+			writeClientErrorJSONResponse(w, json)
+		}
 	} else {
 		defer r.Body.Close()
 		reqBody, _ := io.ReadAll(r.Body)
 		json.Unmarshal(reqBody, &payload)
-		writeInRemoteCSVFile(w)
+		err := i.resources.RemoteCSVFile(payload.User, payload.FileName, payload.QueryType, payload.QueryContent) // TODO - Marshal Error Messages
 	}
 }
 
-func writeNegativeJSONResponse(w http.ResponseWriter, jsonMessage []byte) {
-	w.WriteHeader(http.StatusNotAcceptable)
+// send a negative response to the client if the are:
+// - directory problems, like invalid name/path or fileNotFoundException
+// - Insetion problems.
+// @param json encoded message passed by the caller
+func writeServerErrorJSONResponse(w http.ResponseWriter, jsonMessage []byte) {
+	w.WriteHeader(http.StatusInternalServerError)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonMessage)
 }
 
-func writeSuccessJSONResponse(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusAccepted)
+// send a negative response to client due to Client error
+// - Invalid method
+// @param json encoded message passed by the caller
+func writeClientErrorJSONResponse(w http.ResponseWriter, jsonMessage []byte) {
+	w.WriteHeader(http.StatusBadRequest)
 	w.Header().Set("Content-Type", "application/json")
-	json, _ := errMessage.MarshalSuccessMessage(5)
-	w.Write(json)
+	w.Write(jsonMessage)
 }
 
-func writeInRemoteCSVFile(w http.ResponseWriter) {
-	for {
-		if err := os.Chdir(filepath.Join("local_file_system", payload.User)); err != nil {
-			if os.IsNotExist(err) {
-				controller.createNewDir(payload.User)
-				fmt.Printf("directory creata")
-			}
-		} else {
-			break
-		}
-	}
-
-	file, err := os.OpenFile(payload.FileName, os.O_WRONLY|os.O_CREATE, 0644)
-	if err != nil {
-		jsonErr, _ := errMessage.MarshalErrMessage(4)
-		writeNegativeJSONResponse(w, jsonErr)
-		log.Fatal(err)
-
-		// if the file dont exist
-		if os.IsNotExist(err) {
-			jsonErr, _ := errMessage.MarshalErrMessage(4)
-			writeNegativeJSONResponse(w, jsonErr)
-		}
-	}
-	defer file.Close()
-
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-	if errOnWrite := writer.Write(payload.QueryContent); errOnWrite != nil {
-		panic(err)
-	}
-	writeSuccessJSONResponse(w)
+// send a success response to client due to a corrent insertion
+// in the csv files
+// @param json encoded message passed by the caller
+func writeSuccessJSONResponse(w http.ResponseWriter, jsonMessage []byte) {
+	w.WriteHeader(http.StatusAccepted)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonMessage)
 }

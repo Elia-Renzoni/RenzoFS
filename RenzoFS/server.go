@@ -13,8 +13,9 @@ import (
 )
 
 func main() {
+	insertion := &api.InsertPayLoad{}
 	handle := http.NewServeMux()
-	handle.HandleFunc("/insert", api.HandleInsertion)
+	handle.HandleFunc("/insert", insertion.HandleInsertion)
 	/*handle.HandleFunc("/read", api.HandleRead)
 	handle.HandleFunc("/update", api.HandleUpdate)
 	handle.HandleFunc("/delete", api.HandleDelete)
