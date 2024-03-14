@@ -29,17 +29,22 @@ func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) 
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Header().Set("Content-Type", "application/json")
-		json, err := i.messages.MarshalErrMessage(0)
+		json, err := i.messages.MarshalErrMessage("Method Not Allowed")
 		if err != nil {
 			writeServerErrorJSONResponse(w, json)
 		} else {
 			writeClientErrorJSONResponse(w, json)
 		}
 	} else {
+		// read the request
 		defer r.Body.Close()
 		reqBody, _ := io.ReadAll(r.Body)
 		json.Unmarshal(reqBody, &payload)
 		err := i.resources.RemoteCSVFile(payload.User, payload.FileName, payload.QueryType, payload.QueryContent) // TODO - Marshal Error Messages
+		if err != nil {
+			jsonMessage, _ := i.messages.MarshalErrMessage(err.Error())
+			writeServerErrorJSONResponse(w, jsonMessage)
+		}
 	}
 }
 

@@ -9,6 +9,7 @@ package api
 
 import (
 	"encoding/csv"
+	"errors"
 	"log"
 	"os"
 	"path/filepath"
@@ -62,6 +63,8 @@ func (r *ResourceController) RemoteCSVFile(dir string, filename string, queryTyp
 		err = updateRemoteCSV(dir, filename, query)
 	case delete:
 		err = deleteRemoteCSV(dir, filename, query)
+	default:
+		err = errors.New("Invalid Query Type")
 	}
 	return err
 }
@@ -76,7 +79,7 @@ func writeRemoteCSV(dir, filename string, query []string) error {
 		}
 	}
 
-	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0644)
+	file, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		return err
 	}
@@ -86,6 +89,15 @@ func writeRemoteCSV(dir, filename string, query []string) error {
 	if err := writer.Write(query); err != nil {
 		return err
 	}
+
+	// change work directory
+	defer func() error {
+		if err := os.Chdir("E:/RenzoFS"); err != nil {
+			return err
+		}
+		return nil
+	}()
+
 	return nil
 }
 

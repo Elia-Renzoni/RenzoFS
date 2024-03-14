@@ -14,13 +14,19 @@ import (
 
 func main() {
 	insertion := &api.InsertPayLoad{}
+	read := &api.ReadPayLoad{}
+	delete := &api.DeletePayLoad{}
+	update := &api.UpdatePayLoad{}
+	deleteDir := &api.DeleteDirPayLoad{}
+	createDir := &api.CreateDirPayLoad{}
+
 	handle := http.NewServeMux()
 	handle.HandleFunc("/insert", insertion.HandleInsertion)
-	/*handle.HandleFunc("/read", api.HandleRead)
-	handle.HandleFunc("/update", api.HandleUpdate)
-	handle.HandleFunc("/delete", api.HandleDelete)
-	handle.HandleFunc("/delete/dir", api.HandleDirElimination)
-	handle.HandleFunc("/create/dir", api.HandleDirCreation)*/
+	handle.HandleFunc("/read", read.HandleRead)
+	handle.HandleFunc("/delete", delete.HandleDelete)
+	handle.HandleFunc("/update", update.HandleUpdate)
+	handle.HandleFunc("/delete/{dir}", deleteDir.HandleDirElimination)
+	handle.HandleFunc("/create/{dir}", createDir.HandleDirCreation)
 
 	http.ListenAndServe(":8080", handle)
 }
