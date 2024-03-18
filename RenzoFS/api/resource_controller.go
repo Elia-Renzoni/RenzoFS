@@ -103,6 +103,22 @@ func writeRemoteCSV(dir, filename string, query []string) error {
 
 // TODO
 func readInRemoteCSV(dir, filename string, query []string) error {
+	for {
+		if err := os.Chdir(filepath.Join("local_file_system", dir)); err != nil {
+			return err
+		} else {
+			break;
+		}
+	}
+
+	file, err := os.Open(filename, os.O_RONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close();
+	reader := csv.NewReader(file)
+	// reader logic
+	
 	return nil
 }
 
