@@ -36,14 +36,18 @@ func getResourceControllerInstance() *ResourceController {
 	return resourceControllerInstace
 }
 
-func (r *ResourceController) DreateNewDir(dirname string) {
+func (r *ResourceController) DreateNewDir(dirname string) error {
 	if err := os.Mkdir(filepath.Join("local_file_system", dirname), os.ModeDir); err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
-func (r *ResourceController) DeleteDir(dirname string) {
-	
+func (r *ResourceController) DeleteDir(dirname string) error {
+	if err := os.RemoveAll(dirname); err != nil {
+		return err
+	}
+	return nil
 }
 
 // function to call when the client need to
