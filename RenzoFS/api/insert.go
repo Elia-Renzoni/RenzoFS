@@ -27,14 +27,8 @@ func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) 
 	i.messages = getInstance()
 	i.resources = getResourceControllerInstance()
 	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		w.Header().Set("Content-Type", "application/json")
-		json, err := i.messages.MarshalErrMessage("Method Not Allowed")
-		if err != nil {
-			writeServerErrorJSONResponse(w, json)
-		} else {
-			writeClientErrorJSONResponse(w, json)
-		}
+		json, _ := i.messages.MarshalErrMessage("Method Not Allowed")
+		handleInsertResponse(w, methodNotAllowed, json)
 	} else {
 		// read the request
 		defer r.Body.Close()
@@ -43,35 +37,27 @@ func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) 
 		err := i.resources.RemoteCSVFile(payload.User, payload.FileName, payload.QueryType, payload.QueryContent) // TODO - Marshal Error Messages
 		if err != nil {
 			jsonMessage, _ := i.messages.MarshalErrMessage(err.Error())
-			writeServerErrorJSONResponse(w, jsonMessage)
+			handleInsertResponse(w, serverError, jsonMessage)
+		} else {
+			jsonMessage, _ := i.messages.Marshalsuccess("information successfully added")
+			handleInsertResponse(w, clientSucces, jsonMessage)
 		}
 	}
 }
 
-// send a negative response to the client if the are:
-// - directory problems, like invalid name/path or fileNotFoundException
-// - Insetion problems.
-// @param json encoded message passed by the caller
-func writeServerErrorJSONResponse(w http.ResponseWriter, jsonMessage []byte) {
-	w.WriteHeader(http.StatusInternalServerError)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonMessage)
-}
-
-// send a negative response to client due to Client error
-// - Invalid method
-// @param json encoded message passed by the caller
-func writeClientErrorJSONResponse(w http.ResponseWriter, jsonMessage []byte) {
-	w.WriteHeader(http.StatusBadRequest)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonMessage)
-}
-
-// send a success response to client due to a corrent insertion
-// in the csv files
-// @param json encoded message passed by the caller
-func writeSuccessJSONResponse(w http.ResponseWriter, jsonMessage []byte) {
-	w.WriteHeader(http.StatusAccepted)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonMessage)
+func handleInsertResponse(w http.ResponseWriter, id byte, jsonMessage []byte) {
+	switch id {
+	case methodNotAllowed:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonMessage)
+	case serverError:
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonMessage)
+	case clientSucces:
+		w.WriteHeader(http.StatusAccepted)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonMessage)
+	}
 }

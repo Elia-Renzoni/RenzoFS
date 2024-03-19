@@ -10,7 +10,6 @@ package api
 import (
 	"encoding/csv"
 	"errors"
-	"log"
 	"os"
 	"path/filepath"
 )
@@ -36,7 +35,7 @@ func getResourceControllerInstance() *ResourceController {
 	return resourceControllerInstace
 }
 
-func (r *ResourceController) DreateNewDir(dirname string) error {
+func (r *ResourceController) CreateNewDir(dirname string) error {
 	if err := os.Mkdir(filepath.Join("local_file_system", dirname), os.ModeDir); err != nil {
 		return err
 	}
@@ -44,7 +43,7 @@ func (r *ResourceController) DreateNewDir(dirname string) error {
 }
 
 func (r *ResourceController) DeleteDir(dirname string) error {
-	if err := os.RemoveAll(dirname); err != nil {
+	if err := os.Remove(filepath.Join("local_file_system", dirname)); err != nil {
 		return err
 	}
 	return nil
@@ -78,11 +77,13 @@ func (r *ResourceController) RemoteCSVFile(dir string, filename string, queryTyp
 }
 
 func writeRemoteCSV(dir, filename string, query []string) error {
-	var changer func(string) error = changeWorkDirectory
-	var switchToNormal func() error = switchToRenzoFSDir
-	
-	if err := changer(dir); err != nil {
-		return err
+	for {
+		// change work directory to local_file_system + user dir
+		if err := os.Chdir(filepath.Join("local_file_system", dir)); err != nil {
+			return err
+		} else {
+			break
+		}
 	}
 
 	file, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
@@ -95,27 +96,20 @@ func writeRemoteCSV(dir, filename string, query []string) error {
 	if err := writer.Write(query); err != nil {
 		return err
 	}
-	defer switchToNormal()
+
+	// change work directory
+	defer func() error {
+		if err := os.Chdir("E:/RenzoFS"); err != nil {
+			return err
+		}
+		return nil
+	}()
+
 	return nil
 }
 
 // TODO
 func readInRemoteCSV(dir, filename string, query []string) error {
-	var changer func(string) error = changeWorkDirectory
-	var switchToNormal func() error = switchToRenzoFSDir
-
-	if err := changer(dir); err != nil {
-		return err
-	}
-	
-	file, err := os.Open(filename, os.O_RONLY, 0644)
-	if err != nil {
-		return err
-	}
-	defer file.Close();
-	reader := csv.NewReader(file)
-	// reader logic
-	defer switchToNormal()
 	return nil
 }
 
@@ -126,23 +120,5 @@ func updateRemoteCSV(dir, filename string, query []string) error {
 
 // TODO
 func deleteRemoteCSV(dir, filename string, query []string) error {
-	return nil
-}
-
-func changeWorkDirectory(dir string) error {
-	for {
-		if err := os.Chdir(filepath.Join("local_file_system", dir)); err != nil {
-			return err
-		} else {
-			break;
-		}
-	}
-	return nil
-}
-
-func switchToRenzoFSDir() error {
-	if err := os.Chdir("E:/RenzoFS"); err != nil {
-		return err 
-	}
 	return nil
 }
