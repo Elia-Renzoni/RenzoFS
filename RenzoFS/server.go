@@ -25,7 +25,7 @@ func main() {
 	handle.HandleFunc("/read", read.HandleRead)
 	handle.HandleFunc("/delete", delete.HandleDelete)
 	handle.HandleFunc("/update", update.HandleUpdate)
-	handle.HandleFunc("/delete/{dir}", deleteDir.HandleDirElimination)
+	handle.HandleFunc("/deletedir/{dir}/", deleteDir.HandleDirElimination)
 	handle.HandleFunc("/createdir", createDir.HandleDirCreation)
 
 	http.ListenAndServe(":8080", handle)

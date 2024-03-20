@@ -43,7 +43,7 @@ func (r *ResourceController) CreateNewDir(dirname string) error {
 }
 
 func (r *ResourceController) DeleteDir(dirname string) error {
-	if err := os.Remove(filepath.Join("local_file_system", dirname)); err != nil {
+	if err := os.RemoveAll(filepath.Join("local_file_system", dirname)); err != nil {
 		return err
 	}
 	return nil

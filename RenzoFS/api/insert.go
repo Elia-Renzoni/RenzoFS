@@ -56,7 +56,7 @@ func handleInsertResponse(w http.ResponseWriter, id byte, jsonMessage []byte) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(jsonMessage)
 	case clientSucces:
-		w.WriteHeader(http.StatusAccepted)
+		w.WriteHeader(http.StatusCreated)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(jsonMessage)
 	}
