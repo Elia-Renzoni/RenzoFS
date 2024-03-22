@@ -9,6 +9,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 type DeleteDirPayLoad struct {
@@ -18,7 +19,9 @@ type DeleteDirPayLoad struct {
 }
 
 func (d *DeleteDirPayLoad) HandleDirElimination(w http.ResponseWriter, r *http.Request) {
-	d.dirToDelete = r.URL.Query().Get("dir")
+	tmp := r.URL.Path               // /deletedir/dirname
+	tmp2 := strings.Split(tmp, "/") // [deletedir, dirname]
+	d.dirToDelete = tmp2[2]         // dirname
 	fmt.Printf("%v", d.dirToDelete)
 	d.controller = getResourceControllerInstance()
 	d.messages = getInstance()
@@ -29,9 +32,10 @@ func (d *DeleteDirPayLoad) HandleDirElimination(w http.ResponseWriter, r *http.R
 		if err := d.controller.DeleteDir(d.dirToDelete); err != nil {
 			json, _ := d.messages.MarshalErrMessage(err.Error())
 			handleDeleteDirResponse(w, serverError, json)
+		} else {
+			json, _ := d.messages.Marshalsuccess(d.dirToDelete + " Has Been Deleted")
+			handleDeleteDirResponse(w, clientSucces, json)
 		}
-		json, _ := d.messages.Marshalsuccess(d.dirToDelete + " Has Been Deleted")
-		handleDeleteDirResponse(w, clientSucces, json)
 	}
 }
 

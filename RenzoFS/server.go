@@ -19,14 +19,16 @@ func main() {
 	update := &api.UpdatePayLoad{}
 	deleteDir := &api.DeleteDirPayLoad{}
 	createDir := &api.CreateDirPayLoad{}
+	fileInfo := &api.FileInfo{}
 
 	handle := http.NewServeMux()
 	handle.HandleFunc("/insert", insertion.HandleInsertion)
 	handle.HandleFunc("/read", read.HandleRead)
 	handle.HandleFunc("/delete", delete.HandleDelete)
 	handle.HandleFunc("/update", update.HandleUpdate)
-	handle.HandleFunc("/deletedir/{dir}/", deleteDir.HandleDirElimination)
+	handle.HandleFunc("/deletedir/", deleteDir.HandleDirElimination)
 	handle.HandleFunc("/createdir", createDir.HandleDirCreation)
+	handle.HandleFunc("/fileinfo/", fileInfo.HandleFileInfo)
 
 	http.ListenAndServe(":8080", handle)
 }

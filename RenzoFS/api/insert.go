@@ -23,7 +23,6 @@ type InsertPayLoad struct {
 
 // handle the request
 func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) {
-	payload := new(InsertPayLoad)
 	i.messages = getInstance()
 	i.resources = getResourceControllerInstance()
 	if r.Method != http.MethodPost {
@@ -33,8 +32,8 @@ func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) 
 		// read the request
 		defer r.Body.Close()
 		reqBody, _ := io.ReadAll(r.Body)
-		json.Unmarshal(reqBody, &payload)
-		err := i.resources.RemoteCSVFile(payload.User, payload.FileName, payload.QueryType, payload.QueryContent) // TODO - Marshal Error Messages
+		json.Unmarshal(reqBody, i)
+		err := i.resources.RemoteCSVFile(i.User, i.FileName, i.QueryType, i.QueryContent) // TODO - Marshal Error Messages
 		if err != nil {
 			jsonMessage, _ := i.messages.MarshalErrMessage(err.Error())
 			handleInsertResponse(w, serverError, jsonMessage)

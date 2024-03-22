@@ -43,10 +43,35 @@ func (r *ResourceController) CreateNewDir(dirname string) error {
 }
 
 func (r *ResourceController) DeleteDir(dirname string) error {
-	if err := os.RemoveAll(filepath.Join("local_file_system", dirname)); err != nil {
+	defer func() error {
+		if err := os.Chdir("E:/RenzoFS"); err != nil {
+			return err
+		}
+		return nil
+	}()
+
+	for {
+		// change work directory to local_file_system + user dir
+		if err := os.Chdir(filepath.Join("local_file_system")); err != nil {
+			return err
+		} else {
+			break
+		}
+	}
+	if err := os.Remove(dirname); err != nil {
 		return err
 	}
+
 	return nil
+}
+
+// TODO
+func (r *ResourceController) GetFileInformations(filename string) (os.FileInfo, error) {
+	fileInfo, err := os.Stat(filename)
+	if err != nil {
+		return fileInfo, err
+	}
+	return fileInfo, nil
 }
 
 // function to call when the client need to
