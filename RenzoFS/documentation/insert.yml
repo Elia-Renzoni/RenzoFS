@@ -1,0 +1,10 @@
+# insert API documentation
+title: insert api
+mediaType: [application/json]
+types:
+/insert:
+  descritpion: Insert new values to csv files
+  post:
+    responses:
+      201:
+        new values added

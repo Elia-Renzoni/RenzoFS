@@ -14,21 +14,23 @@ import (
 
 type FileInfo struct {
 	fileName   string
+	dirName    string
 	controller *ResourceController
 	messages   *ResponseMessages
 }
 
 func (f *FileInfo) HandleFileInfo(w http.ResponseWriter, r *http.Request) {
-	tmp := r.URL.Path
-	tmpSlice := strings.Split(tmp, "/")
-	f.fileName = tmpSlice[2]
+	tmp := r.URL.Path                   // fileinfo/user/filename
+	tmpSlice := strings.Split(tmp, "/") // [fileinfo, user, filename]
+	f.fileName = tmpSlice[3]            // filename
+	f.dirName = tmpSlice[2]             // dirname
 	f.controller = getResourceControllerInstance()
 	f.messages = getInstance()
 	if r.Method != http.MethodGet {
 		json, _ := f.messages.MarshalErrMessage("Method Not Valid")
 		handleFileInfoResponse(w, methodNotAllowed, json)
 	} else {
-		fileInfo, err := f.controller.GetFileInformations(f.fileName)
+		fileInfo, err := f.controller.GetFileInformations(f.dirName, f.fileName)
 		if err != nil {
 			json, _ := f.messages.MarshalErrMessage(err.Error())
 			handleFileInfoResponse(w, serverError, json)

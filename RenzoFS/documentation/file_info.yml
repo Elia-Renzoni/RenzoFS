@@ -1,0 +1,13 @@
+paths:
+  /fileinfo/
+  get:
+    summary: get a list of a specific file information
+    responses:
+      '200':
+      description: successful operation
+      content:
+        application/json
+      '500':
+      description: internal server error
+      content:
+        application/json

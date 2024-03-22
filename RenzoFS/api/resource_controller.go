@@ -66,8 +66,20 @@ func (r *ResourceController) DeleteDir(dirname string) error {
 }
 
 // TODO
-func (r *ResourceController) GetFileInformations(filename string) (os.FileInfo, error) {
-	fileInfo, err := os.Stat(filename)
+func (r *ResourceController) GetFileInformations(dirname, filename string) (os.FileInfo, error) {
+	var (
+		fileInfo os.FileInfo
+		err      error
+	)
+	for {
+		// change work directory to local_file_system + user dir
+		if err := os.Chdir(filepath.Join("local_file_system", dirname)); err != nil {
+			return fileInfo, err
+		} else {
+			break
+		}
+	}
+	fileInfo, err = os.Stat(filename)
 	if err != nil {
 		return fileInfo, err
 	}
