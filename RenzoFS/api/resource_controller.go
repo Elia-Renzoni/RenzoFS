@@ -71,6 +71,12 @@ func (r *ResourceController) GetFileInformations(dirname, filename string) (os.F
 		fileInfo os.FileInfo
 		err      error
 	)
+	defer func() error {
+		if err := os.Chdir("E:/RenzoFS"); err != nil {
+			return err
+		}
+		return nil
+	}()
 	for {
 		// change work directory to local_file_system + user dir
 		if err := os.Chdir(filepath.Join("local_file_system", dirname)); err != nil {
