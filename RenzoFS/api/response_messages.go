@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	errorMessage, succMessage string = "err_message", "success_message"
+	errorMessage, succMessage   string = "err_message", "success_message"
+	fileName, fileSize, modTime string = "name", "size", "modification time"
 )
 
 type ResponseMessages struct {
@@ -43,6 +44,16 @@ func (r *ResponseMessages) MarshalErrMessage(messageText string) (jsonErrMessage
 func (r *ResponseMessages) Marshalsuccess(messageText string) (jsonSuccessMessage []byte, err error) {
 	r.succcessMessage = make(map[string]string)
 	r.succcessMessage[succMessage] = messageText
+	jsonSuccessMessage, err = json.Marshal(r.succcessMessage)
+	return
+}
+
+// marhsal success response in case of file information get request
+func (r *ResponseMessages) MarshalSuccessFileInformations(messages [3]string) (jsonSuccessMessage []byte, err error) {
+	r.succcessMessage = make(map[string]string)
+	r.succcessMessage[fileName] = messages[0]
+	r.succcessMessage[fileSize] = messages[1]
+	r.succcessMessage[modTime] = messages[2]
 	jsonSuccessMessage, err = json.Marshal(r.succcessMessage)
 	return
 }

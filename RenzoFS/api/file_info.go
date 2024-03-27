@@ -9,6 +9,7 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -35,8 +36,13 @@ func (f *FileInfo) HandleFileInfo(w http.ResponseWriter, r *http.Request) {
 			json, _ := f.messages.MarshalErrMessage(err.Error())
 			handleFileInfoResponse(w, serverError, json)
 		} else {
-			var informations string = " " + fileInfo.Name() + " " + string(fileInfo.Size()) + " " + fileInfo.ModTime().String()
-			json, _ := f.messages.Marshalsuccess(informations)
+			//var informations string = " " + fileInfo.Name() + " " + string(fileInfo.Size()) + " " + fileInfo.ModTime().String()
+			var messageInfo [3]string = [3]string{
+				fileInfo.Name(),
+				strconv.Itoa(int(fileInfo.Size())),
+				fileInfo.ModTime().GoString(),
+			}
+			json, _ := f.messages.MarshalSuccessFileInformations(messageInfo)
 			handleFileInfoResponse(w, clientSucces, json)
 		}
 	}
