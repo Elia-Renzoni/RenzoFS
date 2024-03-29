@@ -31,11 +31,19 @@ func (c *CreateDirPayLoad) HandleDirCreation(w http.ResponseWriter, r *http.Requ
 	json.Unmarshal(body, c)
 	fmt.Printf("%v", c.DirToCreate)
 	if err := c.controller.CreateNewDir(c.DirToCreate); err != nil {
-		json, _ := c.messages.MarshalErrMessage(err.Error())
-		handleCreateDirResponse(w, serverError, json)
+		json, err := c.messages.MarshalErrMessage(err.Error())
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+		} else {
+			handleCreateDirResponse(w, serverError, json)
+		}
 	} else {
-		json, _ := c.messages.Marshalsuccess(c.DirToCreate + " has been created")
-		handleCreateDirResponse(w, clientSucces, json)
+		json, err := c.messages.Marshalsuccess(c.DirToCreate + " has been created")
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+		} else {
+			handleCreateDirResponse(w, clientSucces, json)
+		}
 	}
 }
 

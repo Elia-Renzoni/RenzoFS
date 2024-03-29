@@ -26,15 +26,27 @@ func (d *DeleteDirPayLoad) HandleDirElimination(w http.ResponseWriter, r *http.R
 	d.controller = getResourceControllerInstance()
 	d.messages = getInstance()
 	if r.Method != http.MethodDelete {
-		json, _ := d.messages.MarshalErrMessage("Method Not Allowed")
-		handleDeleteDirResponse(w, methodNotAllowed, json)
+		json, err := d.messages.MarshalErrMessage("Method Not Allowed")
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+		} else {
+			handleDeleteDirResponse(w, methodNotAllowed, json)
+		}
 	} else {
 		if err := d.controller.DeleteDir(d.dirToDelete); err != nil {
-			json, _ := d.messages.MarshalErrMessage(err.Error())
-			handleDeleteDirResponse(w, serverError, json)
+			json, err := d.messages.MarshalErrMessage(err.Error())
+			if err != nil {
+				http.Error(w, err.Error(), 500)
+			} else {
+				handleDeleteDirResponse(w, serverError, json)
+			}
 		} else {
-			json, _ := d.messages.Marshalsuccess(d.dirToDelete + " Has Been Deleted")
-			handleDeleteDirResponse(w, clientSucces, json)
+			json, err := d.messages.Marshalsuccess(d.dirToDelete + " Has Been Deleted")
+			if err != nil {
+				http.Error(w, err.Error(), 500)
+			} else {
+				handleDeleteDirResponse(w, clientSucces, json)
+			}
 		}
 	}
 }

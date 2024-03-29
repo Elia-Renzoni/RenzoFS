@@ -28,13 +28,21 @@ func (f *FileInfo) HandleFileInfo(w http.ResponseWriter, r *http.Request) {
 	f.controller = getResourceControllerInstance()
 	f.messages = getInstance()
 	if r.Method != http.MethodGet {
-		json, _ := f.messages.MarshalErrMessage("Method Not Valid")
-		handleFileInfoResponse(w, methodNotAllowed, json)
+		json, err := f.messages.MarshalErrMessage("Method Not Valid")
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+		} else {
+			handleFileInfoResponse(w, methodNotAllowed, json)
+		}
 	} else {
 		fileInfo, err := f.controller.GetFileInformations(f.dirName, f.fileName)
 		if err != nil {
-			json, _ := f.messages.MarshalErrMessage(err.Error())
-			handleFileInfoResponse(w, serverError, json)
+			json, err := f.messages.MarshalErrMessage(err.Error())
+			if err != nil {
+				http.Error(w, err.Error(), 500)
+			} else {
+				handleFileInfoResponse(w, serverError, json)
+			}
 		} else {
 			//var informations string = " " + fileInfo.Name() + " " + string(fileInfo.Size()) + " " + fileInfo.ModTime().String()
 			var messageInfo [3]string = [3]string{
@@ -42,8 +50,12 @@ func (f *FileInfo) HandleFileInfo(w http.ResponseWriter, r *http.Request) {
 				strconv.Itoa(int(fileInfo.Size())),
 				fileInfo.ModTime().GoString(),
 			}
-			json, _ := f.messages.MarshalSuccessFileInformations(messageInfo)
-			handleFileInfoResponse(w, clientSucces, json)
+			json, err := f.messages.MarshalSuccessFileInformations(messageInfo)
+			if err != nil {
+				http.Error(w, err.Error(), 500)
+			} else {
+				handleFileInfoResponse(w, clientSucces, json)
+			}
 		}
 	}
 }

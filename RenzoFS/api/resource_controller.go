@@ -9,6 +9,7 @@ package api
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
@@ -61,21 +62,7 @@ func (r *ResourceController) DeleteDir(dirname string) error {
 	if err := firstDirChange(""); err != nil {
 		return err
 	}
-	/*defer func() error {
-		if err := os.Chdir("E:/RenzoFS"); err != nil {
-			return err
-		}
-		return nil
-	}()
 
-	for {
-		// change work directory to local_file_system + user dir
-		if err := os.Chdir(filepath.Join("local_file_system")); err != nil {
-			return err
-		} else {
-			break
-		}
-	}*/
 	if err := os.Remove(dirname); err != nil {
 		return err
 	}
@@ -97,20 +84,7 @@ func (r *ResourceController) GetFileInformations(dirname, filename string) (os.F
 	if err := firstChange(dirname); err != nil {
 		return fileInfo, err
 	}
-	/*defer func() error {
-		if err := os.Chdir("E:/RenzoFS"); err != nil {
-			return err
-		}
-		return nil
-	}()
-	for {
-		// change work directory to local_file_system + user dir
-		if err := os.Chdir(filepath.Join("local_file_system", dirname)); err != nil {
-			return fileInfo, err
-		} else {
-			break
-		}
-	}*/
+
 	fileInfo, err = os.Stat(filename)
 	if err != nil {
 		return fileInfo, err
@@ -156,14 +130,6 @@ func writeRemoteCSV(dir, filename string, query []string) error {
 	if err := firstChange(dir); err != nil {
 		return err
 	}
-	/*for {
-		// change work directory to local_file_system + user dir
-		if err := os.Chdir(filepath.Join("local_file_system", dir)); err != nil {
-			return err
-		} else {
-			break
-		}
-	}*/
 
 	file, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
@@ -176,24 +142,45 @@ func writeRemoteCSV(dir, filename string, query []string) error {
 		return err
 	}
 
-	// change work directory
-	/*defer func() error {
-		if err := os.Chdir("E:/RenzoFS"); err != nil {
-			return err
-		}
-		return nil
-	}()*/
-
 	return nil
 }
 
 // TODO
 func readInRemoteCSV(dir, filename string, query []string) error {
+
 	return nil
 }
 
-// TODO
 func updateRemoteCSV(dir, filename string, query []string) error {
+	var (
+		firstChange      changeWorkDir       = changeWorkerDirectory
+		lastChange       backToHomeDir       = changeToMainDirectory
+		unmarshaledQuery map[string][]string = make(map[string][]string)
+	)
+
+	defer lastChange()
+	if err := firstChange(dir); err != nil {
+		return err
+	}
+
+	// Pay ATTENTION on O_APPEND
+	file, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// unmarshall query, convert from slice of string to map of string a slice of strings
+	for index := range query {
+		json.Unmarshal([]byte(query[index]), unmarshaledQuery)
+	}
+
+	// until the first row is not ended
+	// 			if value == key
+	//				get columns position
+	//				if fieldConent == oldContent
+	//					update it
+
 	return nil
 }
 
