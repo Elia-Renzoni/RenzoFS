@@ -37,7 +37,7 @@ func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) 
 		defer r.Body.Close()
 		reqBody, _ := io.ReadAll(r.Body)
 		json.Unmarshal(reqBody, i)
-		err := i.resources.RemoteCSVFile(i.User, i.FileName, i.QueryType, i.QueryContent) // TODO - Marshal Error Messages
+		err := i.resources.WriteRemoteCSV(i.User, i.FileName, i.QueryType, i.QueryContent)
 		if err != nil {
 			jsonMessage, err := i.messages.MarshalErrMessage(err.Error())
 			if err != nil {

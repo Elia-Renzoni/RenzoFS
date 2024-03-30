@@ -7,10 +7,10 @@ import (
 )
 
 type UpdatePayLoad struct {
-	QueryType    string   `json:"query_type"`
-	User         string   `json:"user_name"`
-	FileName     string   `json:"file_name"`
-	QueryContent []string `json:"query_content"`
+	QueryType    string              `json:"query_type"`
+	User         string              `json:"user_name"`
+	FileName     string              `json:"file_name"`
+	QueryContent map[string][]string `json:"query_content"`
 	controller   *ResourceController
 	messages     *ResponseMessages
 }
@@ -28,7 +28,7 @@ func (u *UpdatePayLoad) HandleUpdate(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		reqBody, _ := io.ReadAll(r.Body)
 		json.Unmarshal(reqBody, u)
-		err := u.controller.RemoteCSVFile(u.User, u.FileName, u.QueryType, u.QueryContent)
+		err := u.controller.UpdateRemoteCSV(u.User, u.FileName, u.QueryType, u.QueryContent)
 		if err != nil {
 			json, err := u.messages.MarshalErrMessage(err.Error())
 			if err != nil {

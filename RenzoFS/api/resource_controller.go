@@ -9,7 +9,6 @@ package api
 
 import (
 	"encoding/csv"
-	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
@@ -70,7 +69,6 @@ func (r *ResourceController) DeleteDir(dirname string) error {
 	return nil
 }
 
-// *
 func (r *ResourceController) GetFileInformations(dirname, filename string) (os.FileInfo, error) {
 	var (
 		fileInfo    os.FileInfo
@@ -92,39 +90,15 @@ func (r *ResourceController) GetFileInformations(dirname, filename string) (os.F
 	return fileInfo, nil
 }
 
-// function to call when the client need to
-// - READ
-// - DELETE
-// - INSERT
-// - UPDATE
-// information in files
-// @param dir of the local file system - username
-// @param file name
-// @param id of the CRUD operation
-// @param query content
-func (r *ResourceController) RemoteCSVFile(dir string, filename string, queryType string, query []string) error {
-	var err error
-	switch queryType {
-	case insert:
-		err = writeRemoteCSV(dir, filename, query)
-	case read:
-		err = readInRemoteCSV(dir, filename, query)
-	case update:
-		err = updateRemoteCSV(dir, filename, query)
-	case delete:
-		err = deleteRemoteCSV(dir, filename, query)
-	default:
-		err = errors.New("Invalid Query Type")
-	}
-	return err
-}
-
-// *
-func writeRemoteCSV(dir, filename string, query []string) error {
+func (r *ResourceController) WriteRemoteCSV(dir, filename, queryType string, query []string) error {
 	var (
 		firstChange changeWorkDir = changeWorkerDirectory
 		lastChange  backToHomeDir = changeToMainDirectory
 	)
+
+	if queryType != insert {
+		return errors.New("Invalid Crud Operation")
+	}
 
 	defer lastChange()
 	if err := firstChange(dir); err != nil {
@@ -146,46 +120,46 @@ func writeRemoteCSV(dir, filename string, query []string) error {
 }
 
 // TODO
-func readInRemoteCSV(dir, filename string, query []string) error {
+func (r *ResourceController) ReadInRemoteCSV(dir, filename, queryType string, query []string) error {
 
 	return nil
 }
 
-func updateRemoteCSV(dir, filename string, query []string) error {
+func (r *ResourceController) UpdateRemoteCSV(dir, filename, queryType string, query map[string][]string) error {
 	var (
-		firstChange      changeWorkDir       = changeWorkerDirectory
-		lastChange       backToHomeDir       = changeToMainDirectory
-		unmarshaledQuery map[string][]string = make(map[string][]string)
+		firstChange changeWorkDir = changeWorkerDirectory
+		lastChange  backToHomeDir = changeToMainDirectory
 	)
+
+	if queryType != update {
+		return errors.New("Invalid Crud Operation")
+	}
 
 	defer lastChange()
 	if err := firstChange(dir); err != nil {
 		return err
 	}
 
-	// Pay ATTENTION on O_APPEND
-	file, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, 0644)
+	file, err := os.OpenFile(filename, os.O_RDWR, 0644)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	// unmarshall query, convert from slice of string to map of string a slice of strings
-	for index := range query {
-		json.Unmarshal([]byte(query[index]), unmarshaledQuery)
+	reader := csv.NewReader(file)
+	fileContent, err := reader.ReadAll()
+	if err != nil {
+		return err
 	}
-
-	// until the first row is not ended
-	// 			if value == key
-	//				get columns position
-	//				if fieldConent == oldContent
-	//					update it
-
+	// parse the file content
+	for _, value := range fileContent {
+		// TODO
+	}
 	return nil
 }
 
 // TODO
-func deleteRemoteCSV(dir, filename string, query []string) error {
+func (r *ResourceController) DeleteRemoteCSV(dir, filename string, query []string) error {
 	return nil
 }
 
