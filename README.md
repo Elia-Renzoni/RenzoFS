@@ -53,9 +53,9 @@ Query Format: <br>
   "user_name":"elia",
   "destination": "myFile",
   "query_content": {
-    "field1": "value",
-    "field2": [44, 6],
-    "field3": 33.0
+    "ColumnName": ["old", "new"],
+    "ColumnName": ["old", "new"],
+    "ColumnName": ["old", "new"]
   }  
 }
 ```
