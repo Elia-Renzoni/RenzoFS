@@ -127,8 +127,10 @@ func (r *ResourceController) ReadInRemoteCSV(dir, filename, queryType string, qu
 
 func (r *ResourceController) UpdateRemoteCSV(dir, filename, queryType string, query map[string][]string) error {
 	var (
-		firstChange changeWorkDir = changeWorkerDirectory
-		lastChange  backToHomeDir = changeToMainDirectory
+		firstChange     changeWorkDir = changeWorkerDirectory
+		lastChange      backToHomeDir = changeToMainDirectory
+		positionalIndex []int         = make([]int, 0)
+		columns         []string      = make([]string, 0)
 	)
 
 	if queryType != update {
@@ -151,10 +153,39 @@ func (r *ResourceController) UpdateRemoteCSV(dir, filename, queryType string, qu
 	if err != nil {
 		return err
 	}
+
 	// parse the file content
-	for _, value := range fileContent {
-		// TODO
+	// da migliorare
+	for index, value := range fileContent {
+		for index := range value {
+			for key := range query {
+				switch {
+				case value[index] == key:
+					positionalIndex = append(positionalIndex, index) // indici che mi servono per muovermi dopo
+					columns = append(columns, key)                   // chiavi per prendere i valori della mappa
+				}
+			}
+		}
+
+		if index >= 1 {
+			for index := range value {
+				for _, position := range positionalIndex {
+					if index == position {
+						valueSet := query[columns[index]]
+						if valueSet[0] == value[index] {
+							value[index] = valueSet[1] // modifico il dato
+						}
+					}
+				}
+			}
+		}
 	}
+
+	writer := csv.NewWriter(file)
+	if err := writer.WriteAll(fileContent); err != nil {
+		return err
+	}
+
 	return nil
 }
 
