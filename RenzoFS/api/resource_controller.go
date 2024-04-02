@@ -17,6 +17,11 @@ import (
 type ResourceController struct {
 }
 
+type PairChecker struct {
+	columnName  string
+	columnIndex int
+}
+
 // change the worker dir to path specified
 type changeWorkDir func(string) error
 
@@ -48,7 +53,6 @@ func (r *ResourceController) CreateNewDir(dirname string) error {
 	return nil
 }
 
-// *
 func (r *ResourceController) DeleteDir(dirname string) error {
 	var (
 		firstDirChange changeWorkDir = changeWorkerDirectory
@@ -120,17 +124,16 @@ func (r *ResourceController) WriteRemoteCSV(dir, filename, queryType string, que
 }
 
 // TODO
-func (r *ResourceController) ReadInRemoteCSV(dir, filename, queryType string, query []string) error {
+func (r *ResourceController) ReadInRemoteCSV(dir, filename, queryType string, query map[string][]string) error {
 
 	return nil
 }
 
 func (r *ResourceController) UpdateRemoteCSV(dir, filename, queryType string, query map[string][]string) error {
 	var (
-		firstChange     changeWorkDir = changeWorkerDirectory
-		lastChange      backToHomeDir = changeToMainDirectory
-		positionalIndex []int         = make([]int, 0)
-		columns         []string      = make([]string, 0)
+		firstChange         changeWorkDir = changeWorkerDirectory
+		lastChange          backToHomeDir = changeToMainDirectory
+		storeControlResults []PairChecker = make([]PairChecker, 0)
 	)
 
 	if queryType != update {
@@ -154,26 +157,28 @@ func (r *ResourceController) UpdateRemoteCSV(dir, filename, queryType string, qu
 		return err
 	}
 
-	// parse the file content
-	// da migliorare
-	for index, value := range fileContent {
-		for index := range value {
-			for key := range query {
-				switch {
-				case value[index] == key:
-					positionalIndex = append(positionalIndex, index) // indici che mi servono per muovermi dopo
-					columns = append(columns, key)                   // chiavi per prendere i valori della mappa
+	// parse the file content and change file's informations
+	for row, partialFileContent := range fileContent {
+		if row == 0 {
+			for index := range partialFileContent {
+				for key := range query {
+					if partialFileContent[index] == key {
+						storeControlResults = append(storeControlResults, PairChecker{
+							columnName:  key,
+							columnIndex: index,
+						})
+					}
 				}
 			}
-		}
-
-		if index >= 1 {
-			for index := range value {
-				for _, position := range positionalIndex {
-					if index == position {
-						valueSet := query[columns[index]]
-						if valueSet[0] == value[index] {
-							value[index] = valueSet[1] // modifico il dato
+		} else {
+			for index := range partialFileContent {
+				for _, value := range storeControlResults {
+					if index == value.columnIndex {
+						if queryValue, ok := query[value.columnName]; ok {
+							if queryValue[0] == partialFileContent[index] {
+								// now i change the value
+								partialFileContent[index] = queryValue[1]
+							}
 						}
 					}
 				}
