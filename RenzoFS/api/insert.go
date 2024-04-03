@@ -17,6 +17,7 @@ type InsertPayLoad struct {
 	User         string   `json:"user"`
 	FileName     string   `json:"file_name"`
 	QueryContent []string `json:"query_content"`
+	UUID         int
 	messages     *ResponseMessages
 	resources    *ResourceController
 }
