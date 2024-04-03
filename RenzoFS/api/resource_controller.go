@@ -194,8 +194,64 @@ func (r *ResourceController) UpdateRemoteCSV(dir, filename, queryType string, qu
 	return nil
 }
 
-// TODO
-func (r *ResourceController) DeleteRemoteCSV(dir, filename string, query []string) error {
+func (r *ResourceController) DeleteRemoteCSV(dir, filename, queryType string, query map[string][]string) error {
+	var (
+		firstChange         changeWorkDir = changeWorkerDirectory
+		lastChange          backToHomeDir = changeToMainDirectory
+		emptyField          string        = ""
+		storeControlResults []PairChecker = make([]PairChecker, 0)
+	)
+
+	if queryType != delete {
+		return errors.New("Invalid Crud Operation")
+	}
+
+	defer lastChange()
+	if err := firstChange(dir); err != nil {
+		return err
+	}
+
+	file, err := os.OpenFile(filename, os.O_RDWR, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	fileContent, err := reader.ReadAll()
+	if err != nil {
+		return err
+	}
+
+	// delete informations algorithm
+	for row, partialFileContent := range fileContent {
+		if row == 0 {
+			for index := range partialFileContent {
+				for key := range query {
+					if partialFileContent[index] == key {
+						storeControlResults = append(storeControlResults, PairChecker{
+							columnName:  key,
+							columnIndex: index,
+						})
+					}
+				}
+			}
+		} else {
+			for index := range partialFileContent {
+				for _, value := range storeControlResults {
+					if index == value.columnIndex {
+						if queryValue, ok := query[value.columnName]; ok {
+							if queryValue[0] == partialFileContent[index] {
+								// now i change the value
+								partialFileContent[index] = emptyField
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return nil
 }
 
