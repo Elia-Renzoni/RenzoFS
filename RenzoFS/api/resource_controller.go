@@ -124,9 +124,9 @@ func (r *ResourceController) WriteRemoteCSV(dir, filename, queryType string, que
 }
 
 // TODO
-func (r *ResourceController) ReadInRemoteCSV(dir, filename, queryType string, query map[string][]string) error {
+func (r *ResourceController) ReadInRemoteCSV(dir, filename, queryType string, query map[string][]string) (map[string]string, error) {
 
-	return nil
+	return nil, nil
 }
 
 func (r *ResourceController) UpdateRemoteCSV(dir, filename, queryType string, query map[string][]string) error {
@@ -134,6 +134,7 @@ func (r *ResourceController) UpdateRemoteCSV(dir, filename, queryType string, qu
 		firstChange         changeWorkDir = changeWorkerDirectory
 		lastChange          backToHomeDir = changeToMainDirectory
 		storeControlResults []PairChecker = make([]PairChecker, 0)
+		idList              []string      = make([]string, 0)
 	)
 
 	if queryType != update {
@@ -170,14 +171,31 @@ func (r *ResourceController) UpdateRemoteCSV(dir, filename, queryType string, qu
 					}
 				}
 			}
+
+			// extraction
+			for _, value := range query {
+				idList = append(idList, value[0])
+			}
 		} else {
 			for index := range partialFileContent {
-				for _, value := range storeControlResults {
-					if index == value.columnIndex {
-						if queryValue, ok := query[value.columnName]; ok {
-							if queryValue[0] == partialFileContent[index] {
-								// now i change the value
-								partialFileContent[index] = queryValue[1]
+				var exit bool
+				if index == 0 {
+					for indexIdList := range idList {
+						if idList[indexIdList] == partialFileContent[index] {
+							exit = true
+						}
+					}
+					if !exit {
+						break
+					}
+				} else {
+					for _, value := range storeControlResults {
+						if index == value.columnIndex {
+							if queryValue, ok := query[value.columnName]; ok {
+								if queryValue[1] == partialFileContent[index] {
+									// now i change the value
+									partialFileContent[index] = queryValue[2]
+								}
 							}
 						}
 					}
@@ -237,18 +255,7 @@ func (r *ResourceController) DeleteRemoteCSV(dir, filename, queryType string, qu
 				}
 			}
 		} else {
-			for index := range partialFileContent {
-				for _, value := range storeControlResults {
-					if index == value.columnIndex {
-						if queryValue, ok := query[value.columnName]; ok {
-							if queryValue[0] == partialFileContent[index] {
-								// now i change the value
-								partialFileContent[index] = emptyField
-							}
-						}
-					}
-				}
-			}
+			// TODO
 		}
 	}
 
