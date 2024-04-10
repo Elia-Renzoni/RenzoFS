@@ -10,8 +10,11 @@ package api
 import (
 	"encoding/csv"
 	"errors"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 )
 
 type ResourceController struct {
@@ -212,11 +215,11 @@ func (r *ResourceController) UpdateRemoteCSV(dir, filename, queryType string, qu
 	return nil
 }
 
-func (r *ResourceController) DeleteRemoteCSV(dir, filename, queryType string, query map[string][]string) error {
+func (r *ResourceController) DeleteRemoteCSV(dir, filename, queryType string, query url.Values) error {
 	var (
 		firstChange         changeWorkDir = changeWorkerDirectory
 		lastChange          backToHomeDir = changeToMainDirectory
-		emptyField          string        = ""
+		emptyField          string        = "/"
 		storeControlResults []PairChecker = make([]PairChecker, 0)
 	)
 
@@ -245,18 +248,42 @@ func (r *ResourceController) DeleteRemoteCSV(dir, filename, queryType string, qu
 	for row, partialFileContent := range fileContent {
 		if row == 0 {
 			for index := range partialFileContent {
-				for key := range query {
-					if partialFileContent[index] == key {
-						storeControlResults = append(storeControlResults, PairChecker{
-							columnName:  key,
-							columnIndex: index,
-						})
-					}
+				column := query["column"]
+				effectiveColumn := column[0]
+				if partialFileContent[index] == strings.ToUpper(effectiveColumn[:0]) {
+					storeControlResults = append(storeControlResults, PairChecker{
+						columnName:  strings.ToUpper(effectiveColumn[:0]),
+						columnIndex: index,
+					})
 				}
 			}
 		} else {
-			// TODO
+			for index := range partialFileContent {
+				if index == 0 {
+					var exit bool
+					id := query["id"]
+					if convertedId, _ := strconv.Atoi(id[0]); convertedId == index {
+						exit = true
+					}
+
+					if !exit {
+						break
+					}
+				} else {
+					for _, value := range storeControlResults {
+						if value.columnIndex == index {
+							partialFileContent[index] = emptyField
+						}
+					}
+				}
+
+			}
 		}
+	}
+
+	writer := csv.NewWriter(file)
+	if err := writer.WriteAll(fileContent); err != nil {
+		return err
 	}
 
 	return nil

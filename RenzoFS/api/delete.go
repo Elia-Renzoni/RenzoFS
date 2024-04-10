@@ -18,8 +18,8 @@ func (d *DeletePayLoad) HandleDelete(w http.ResponseWriter, r *http.Request) {
 	d.messages = getInstance()
 	tmp := r.URL.Path
 	tmp2 := strings.Split(tmp, "/")
-	d.user = tmp2[1]
-	d.fileName = tmp2[2]
+	d.user = tmp2[2]
+	d.fileName = tmp2[3]
 	d.url = r.URL.Query()
 	if r.Method != http.MethodDelete {
 		json, err := d.messages.MarshalErrMessage("Method Not Allowed")
