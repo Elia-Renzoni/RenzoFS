@@ -28,7 +28,20 @@ func (r *ReadPayLoad) HandleRead(w http.ResponseWriter, req *http.Request) {
 		}
 		handleGetResponses(w, methodNotAllowed, json)
 	} else {
-		// TODO
+		responseToEncode, err := r.controller.ReadInRemoteCSV(r.user, r.fileName, "read", r.url)
+		if err != nil {
+			json, err := r.messages.MarshalErrMessage("Internal Server Error")
+			if err != nil {
+				http.Error(w, err.Error(), 500)
+			}
+			handleGetResponses(w, serverError, json)
+		} else {
+			json, err := r.messages.MarshalSuccesReadResults(responseToEncode)
+			if err != nil {
+				http.Error(w, err.Error(), 500)
+			}
+			handleGetResponses(w, clientSucces, json)
+		}
 	}
 }
 

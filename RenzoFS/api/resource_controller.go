@@ -127,9 +127,65 @@ func (r *ResourceController) WriteRemoteCSV(dir, filename, queryType string, que
 }
 
 // TODO
-func (r *ResourceController) ReadInRemoteCSV(dir, filename, queryType string, query map[string][]string) (map[string]string, error) {
+func (r *ResourceController) ReadInRemoteCSV(dir, filename, queryType string, query url.Values) (map[string]string, error) {
+	var (
+		firstChange         changeWorkDir     = changeWorkerDirectory
+		lastChange          backToHomeDir     = changeToMainDirectory
+		storeControlResult  []PairChecker     = make([]PairChecker, 0)
+		idToSearch          string            = query.Get("id")
+		readOperationResult map[string]string = make(map[string]string)
+	)
 
-	return nil, nil
+	if queryType != read {
+		return nil, errors.New("Invalid Crud Operation")
+	}
+
+	defer lastChange()
+	if err := firstChange(dir); err != nil {
+		return nil, err
+	}
+
+	file, err := os.OpenFile(filename, os.O_RDONLY, 0644)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	fileContent, err := reader.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	for rows, partialFileContent := range fileContent {
+		if rows == 0 {
+			for index := range partialFileContent {
+				if index > 0 {
+					storeControlResult = append(storeControlResult, PairChecker{
+						columnName:  partialFileContent[index],
+						columnIndex: index,
+					})
+				}
+			}
+		} else {
+			for index := range partialFileContent {
+				if index == 0 {
+					if partialFileContent[index] != idToSearch {
+						break
+					}
+				}
+
+				for _, value := range storeControlResult {
+					if value.columnIndex == index {
+						readOperationResult[value.columnName] = partialFileContent[index]
+						break
+					}
+				}
+			}
+		}
+	}
+
+	return readOperationResult, nil
 }
 
 func (r *ResourceController) UpdateRemoteCSV(dir, filename, queryType string, query map[string][]string) error {

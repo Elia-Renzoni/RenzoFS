@@ -23,7 +23,7 @@ func main() {
 
 	handle := http.NewServeMux()
 	handle.HandleFunc("/insert", insertion.HandleInsertion)
-	handle.HandleFunc("/read", read.HandleRead)
+	handle.HandleFunc("/read/", read.HandleRead)
 	handle.HandleFunc("/delete/", delete.HandleDelete)
 	handle.HandleFunc("/update", update.HandleUpdate)
 	handle.HandleFunc("/deletedir/", deleteDir.HandleDirElimination)

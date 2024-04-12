@@ -57,3 +57,8 @@ func (r *ResponseMessages) MarshalSuccessFileInformations(messages [3]string) (j
 	jsonSuccessMessage, err = json.Marshal(r.succcessMessage)
 	return
 }
+
+func (r *ResponseMessages) MarshalSuccesReadResults(messageToEncode map[string]string) (jsonSuccessMessage []byte, err error) {
+	jsonSuccessMessage, err = json.Marshal(messageToEncode)
+	return
+}
