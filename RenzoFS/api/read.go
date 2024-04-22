@@ -16,8 +16,8 @@ type ReadPayLoad struct {
 func (r *ReadPayLoad) HandleRead(w http.ResponseWriter, req *http.Request) {
 	tmp := req.URL.Path             // read/user/filename
 	tmp2 := strings.Split(tmp, "/") // [read, user, filename]
-	r.user = tmp2[1]                // user
-	r.fileName = tmp2[2]            // filename
+	r.user = tmp2[2]                // user
+	r.fileName = tmp2[3]            // filename
 	r.url = req.URL.Query()
 	r.controller = getResourceControllerInstance()
 	r.messages = getInstance()
@@ -30,7 +30,7 @@ func (r *ReadPayLoad) HandleRead(w http.ResponseWriter, req *http.Request) {
 	} else {
 		responseToEncode, err := r.controller.ReadInRemoteCSV(r.user, r.fileName, "read", r.url)
 		if err != nil {
-			json, err := r.messages.MarshalErrMessage("Internal Server Error")
+			json, err := r.messages.MarshalErrMessage(err.Error())
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 			}

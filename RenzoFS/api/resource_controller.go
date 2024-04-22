@@ -10,6 +10,7 @@ package api
 import (
 	"encoding/csv"
 	"errors"
+	"fmt"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -135,6 +136,8 @@ func (r *ResourceController) ReadInRemoteCSV(dir, filename, queryType string, qu
 		idToSearch          string            = query.Get("id")
 		readOperationResult map[string]string = make(map[string]string)
 	)
+
+	fmt.Printf("%s", idToSearch)
 
 	if queryType != read {
 		return nil, errors.New("Invalid Crud Operation")
