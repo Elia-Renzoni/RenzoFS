@@ -1,7 +1,7 @@
 /**
 *	@author Elia Renzoni
-*	@date 02/02/2024
-*	@brief Insert json query to files API
+*	@date 22/04/2024
+*	@brief This module handles the insertions of information in files by users
 **/
 
 package api
@@ -13,16 +13,28 @@ import (
 )
 
 type InsertPayLoad struct {
-	QueryType    string   `json:"query_type"`
-	User         string   `json:"user"`
-	FileName     string   `json:"file_name"`
+	// contain the type of the query
+	// in this case it must be an insert
+	// query
+	QueryType string `json:"query_type"`
+
+	// contain the directory name
+	User string `json:"user"`
+
+	// contain the file name
+	FileName string `json:"file_name"`
+
+	// contain the query content that is a JSON array
 	QueryContent []string `json:"query_content"`
-	UUID         int
-	messages     *ResponseMessages
-	resources    *ResourceController
+
+	// composition fields
+	messages  *ResponseMessages
+	resources *ResourceController
 }
 
-// handle the request
+// this method handle the POST operation thath is
+// related to the insertion of new information to
+// the specified file
 func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) {
 	i.messages = getInstance()
 	i.resources = getResourceControllerInstance()
@@ -57,6 +69,11 @@ func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
+// this function set the responses that the
+// server has to write to the client
+// @param id indicate the type of response @see enumeration
+// @param jsonMessage indicate the JSON response to write in
+// te response payload
 func handleInsertResponse(w http.ResponseWriter, id byte, jsonMessage []byte) {
 	switch id {
 	case methodNotAllowed:

@@ -1,3 +1,10 @@
+/**
+*	@author Elia Renzoni
+*	@brief this module handles the GET requests made to the server,
+*	in particular it returns to the client the information associated
+*	with the id indicated in the query
+**/
+
 package api
 
 import (
@@ -7,18 +14,26 @@ import (
 )
 
 type ReadPayLoad struct {
+	// directory name and inner file name
 	user, fileName string
-	url            url.Values // map[string][]string
-	controller     *ResourceController
-	messages       *ResponseMessages
+
+	// URL written by the client
+	url url.Values // map[string][]string
+
+	// composition fields
+	controller *ResourceController
+	messages   *ResponseMessages
 }
 
+// this method handle the GET crud operation
+// access to the specified file and return
+// the content that match with the written id
 func (r *ReadPayLoad) HandleRead(w http.ResponseWriter, req *http.Request) {
 	tmp := req.URL.Path             // read/user/filename
 	tmp2 := strings.Split(tmp, "/") // [read, user, filename]
 	r.user = tmp2[2]                // user
 	r.fileName = tmp2[3]            // filename
-	r.url = req.URL.Query()
+	r.url = req.URL.Query()         // get the url query section
 	r.controller = getResourceControllerInstance()
 	r.messages = getInstance()
 	if req.Method != http.MethodGet {
@@ -45,6 +60,11 @@ func (r *ReadPayLoad) HandleRead(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// this function set the responses that the
+// server has to write to the client
+// @param id indicates the type of response @see enumeration
+// @param jsonMessage indicates the JSON response to write in
+// the response payload
 func handleGetResponses(w http.ResponseWriter, id byte, jsonMessage []byte) {
 	switch id {
 	case serverError:
