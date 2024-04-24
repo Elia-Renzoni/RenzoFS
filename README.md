@@ -23,7 +23,7 @@ The main functionalities of the distributed service are: <br>
 
 ## Distributed Storage Service
 this micro service handles access to remote files and directories, allowing you to store new changes, such as removing files or directories, or even editing and reading files. <br>
-Query Format: <br>
+Query Format and API endpoints: <br>
 
 * Write (POST) : <br>
 ```json
@@ -33,6 +33,10 @@ Query Format: <br>
   "destination": "myFile",
   "query_content": ["value1", "44", "value2", "55.5"]
 }
+```
+Endpoint 
+```
+localhost:8080/insert
 ```
 
 * Read (GET) : <br>
@@ -52,6 +56,10 @@ localhost:8080/read/{dirname}/{filename}/?id=...
   }  
 }
 ```
+Endpoint
+```
+localhost:8080/update
+```
 * Delete (DELETE): <br>
 ```
 localhost:8080/delete/{dirname}/{filename}/?id=...&field=...
@@ -62,6 +70,10 @@ localhost:8080/delete/{dirname}/{filename}/?id=...&field=...
   "dir_to_create": "...."
 }
 ```
+Endpoint
+```
+localhost:8080/createdir
+```
 * Delete a remote directory (DELETE): <br>
 ```
 localhost:8080/deletedir/{dirname}
@@ -71,7 +83,4 @@ localhost:8080/deletedir/{dirname}
 localhost:8080/fileinfo/{dirname}/{filename}
 ```
 <br>
-Future changes : <br>
-* Implementing a Microservices architecture;
-* Implementing a Cluster-based file storage system;
-* Implementing an Eventual Consistency system, based on a follower-leader architecture.
+
