@@ -20,6 +20,8 @@ The main functionalities of the distributed service are: <br>
 |Provide info about who, and when, queried files|
 |File sharing|
 
+## API Gateway
+TODO
 
 ## Distributed Storage Service
 this micro service handles access to remote files and directories, allowing you to store new changes, such as removing files or directories, or even editing and reading files. <br>
