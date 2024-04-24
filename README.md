@@ -1,8 +1,5 @@
 # RenzoFS
 
-
-![Diagramma senza titolo drawio](https://github.com/Elia-Renzoni/RenzoFS/assets/118525453/3cd2ba5c-f996-4379-98b5-5c254a446978)
-<br>
 ![renzofs](https://github.com/Elia-Renzoni/RenzoFS/assets/118525453/90fb82a2-60a1-49ea-a8d2-2702bc451ab8)
 
 <br>
