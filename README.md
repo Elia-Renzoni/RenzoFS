@@ -87,3 +87,6 @@ localhost:8080/fileinfo/{dirname}/{filename}
 <br>
 Note that the structure of the file system starts from the root that is RenzoFS, so to move between the files and modify them was appropriate to change rempentinamente working directory
 
+## Statistic Service
+TODO
+## Log-in Log-out Service
