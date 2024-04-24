@@ -20,7 +20,7 @@ The main functionalities of the distributed service are: <br>
 |Provide info about who, and when, queried files|
 |File sharing|
 
-<br>
+
 ## Distributed Storage Service
 Query Format: <br>
 
