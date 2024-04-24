@@ -21,6 +21,7 @@ The main functionalities of the distributed service are: <br>
 |File sharing|
 
 <br>
+## Distributed Storage Service
 Query Format: <br>
 
 * Write (POST) : <br>
