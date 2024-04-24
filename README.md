@@ -22,6 +22,7 @@ The main functionalities of the distributed service are: <br>
 
 
 ## Distributed Storage Service
+this micro service handles access to remote files and directories, allowing you to store new changes, such as removing files or directories, or even editing and reading files. <br>
 Query Format: <br>
 
 * Write (POST) : <br>
