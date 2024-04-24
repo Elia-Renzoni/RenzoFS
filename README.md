@@ -4,10 +4,10 @@
 
 <br>
 
-RenzoFS is a distributed file system with a web based interface that allows users to see their remote file system and query their file, using json written query. <br>
+RenzoFS is a distributed file system that allows users to query their file, using json written query. <br>
 <br>
-The backend is written in Go (1.20) and uses RESTful API to interact with the web server, specially with the remote file system, witch is accessed by client only on remote access model, instead of upload-download access model. <br>
-The main functionalities of the API are: <br>
+The distributed service is written in Go (1.20) and uses REST protocol as communication model, ensuring a remote access model, instead of upload-download access model. <br>
+The main functionalities of the distributed service are: <br>
 |Functionality|
 |-------------|
 |Sign in user|
@@ -34,17 +34,8 @@ Query Format: <br>
 ```
 
 * Read (GET) : <br>
-```json
-{
-  "query_type": "select",
-  "user_name":"elia",
-  "destination": "myFile",
-  "query_content": {
-    "field1": "value",
-    "field2": "all_items",
-    "filed3": 23
-  }
-}
+```
+localhost:8080/read/{dirname}/{filename}/?id=...
 ```
 * Update (PATCH) : <br>
 ```json
@@ -60,79 +51,24 @@ Query Format: <br>
 }
 ```
 * Delete (DELETE): <br>
+```
+localhost:8080/delete/{dirname}/{filename}/?id=...&field=...
+```
+* Create a new remote directory (POST): <br>
 ```json
 {
-  "query_type": "delete",
-  "user_name":"elia",
-  "destination": "myFile",
-  "query_content": {
-    "field1": "all_items",
-    "field2": 56,
-    "filed3": "example2"
-  }
+  "dir_to_create": "...."
 }
 ```
-Advanced Query: <br>
-* Filtering (GET) : 
-```json
-{
-  "query_type": "select",
-  "user_name":"elia",
-  "destination": "myFile",
-  "query_content": {
-    "field1": "example1",
-    "field2": "example2",
-    "field3": "example3",
-    "field4": {
-      "between": [30, 40]
-    },
-    "field5": {
-      "max": 50
-    },
-    "field6": {
-      "min": 30
-    },
-    "field7": {
-      "word_length": 60
-    }
-  }
-}
+* Delete a remote directory (DELETE): <br>
 ```
-|Instructions|
-|------------|
-|between|
-|max|
-|min|
-|length|
-|min_length|
-|max_length|
-|length_between|
-* Union (GET) : <br>
-```json
-{
-  "query_type": "select",
-  "user_name":"elia",
-  "destination": "myFile",
-  "query_content": {
-    "field1": "value",
-    "field2": "all_items",
-    "filed3": 23
-  },
-  "union":{
-    "destination": "myFile2",
-    "field1": "value",
-    "field2": 233
-  }
-}
+localhost:8080/deletedir/{dirname}
 ```
-* Sorting (GET, PATCH, POST) : <br>
-```json
-{
-  "sort_asc": true,
-  "sort_desc": true
-}
+* Get a file informations (GET): <br>
 ```
-
+localhost:8080/fileinfo/{dirname}/{filename}
+```
+<br>
 Future changes : <br>
 * Implementing a Microservices architecture;
 * Implementing a Cluster-based file storage system;
