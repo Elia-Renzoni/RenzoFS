@@ -7,8 +7,11 @@
 package renzofsreverseproxy
 
 import (
+	"bufio"
+	"fmt"
 	"log"
 	"net"
+	"strings"
 )
 
 type RenzoFSReverseProxy struct {
@@ -29,7 +32,7 @@ type ServerPool struct {
 	endpoint string
 
 	// server listen port
-	port int
+	port string
 
 	// server ip address
 	IPaddress string
@@ -38,7 +41,7 @@ type ServerPool struct {
 // this function set-up a new reverse proxy server
 // by passing as arguments the ip adress and the
 // port by witch the server can start
-func (s *RenzoFSReverseProxy) NewServer(ipAddress, tcpInfo, clientListenPort, serverListenPort string) *RenzoFSReverseProxy {
+func (s *RenzoFSReverseProxy) NewReverseProxyServer(ipAddress, tcpInfo, clientListenPort, serverListenPort string) *RenzoFSReverseProxy {
 	return &RenzoFSReverseProxy{
 		IPaddress:            ipAddress,
 		ListenPortForClient:  clientListenPort,
@@ -70,6 +73,10 @@ func (s *RenzoFSReverseProxy) StartListenForClient() {
 	}
 }
 
+// this method make the server listen
+// to incoming service request that
+// wuold add theif informations in the
+// server pool Slice
 func (s *RenzoFSReverseProxy) StartListenForServers() {
 	var err error
 	completeAddress := makeEntireReverseProxyServerAddress(s.ListenPortForServers, s.IPaddress)
@@ -83,7 +90,7 @@ func (s *RenzoFSReverseProxy) StartListenForServers() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		go checkServerPool(s.serverConn)
+		checkServerPool(s.serverConn, s)
 	}
 }
 
@@ -97,16 +104,60 @@ func (s *RenzoFSReverseProxy) CloseAll() {
 
 // this function enable reverse proxy server
 // to handle both clients and server request
-func handleRequests(req net.Conn) {
+func handleRequests(conn net.Conn) {
 	// TODO
 }
 
-func checkServerPool(conn net.Conn) {
+// this function must control if the
+// service information are in the slice
+// if there are not in the slice it must
+// add it.
+// the message send from the services
+// follow this form: enpoint \t addr \t port
+func checkServerPool(conn net.Conn, s *RenzoFSReverseProxy) {
+	var (
+		message string
+		scanner *bufio.Scanner
+		exist   bool = true
+	)
+	scanner = bufio.NewScanner(conn)
+	// takes one message from services each iteration
+	for scanner.Scan() {
+		message = scanner.Text()
+		splittedMessage := strings.Split(message, "\t")
+		endpoint := splittedMessage[0]
+		address := splittedMessage[1]
+		port := splittedMessage[2]
 
+		for index := range s.serverPool {
+			switch {
+			case !(s.serverPool[index].endpoint == endpoint):
+				fallthrough
+			case !(s.serverPool[index].IPaddress == address):
+				fallthrough
+			case !(s.serverPool[index].port == port):
+				exist = false
+			default:
+				exist = true
+			}
+		}
+
+		// if informations doesn't exist
+		if !exist {
+			addToServerPool(endpoint, address, port, s)
+		}
+	}
 }
 
-func addToServerPool() {
-	// TODO
+// this function add the services to
+// server pool slice
+func addToServerPool(endpoint, address, port string, s *RenzoFSReverseProxy) {
+	s.serverPool = append(s.serverPool, ServerPool{
+		endpoint:  endpoint,
+		IPaddress: address,
+		port:      port,
+	})
+	fmt.Printf("Added a new Service to Server Pool")
 }
 
 // this function couple the host name to
