@@ -7,30 +7,10 @@
 package main
 
 import (
-	"fmt"
-	"io"
-	"log"
-	"net"
+	renzofsreverseproxy "renzofs/renzofs_reverse_proxy"
 )
 
 func main() {
-	buffer := make([]byte, 1024)
-	listener, err := net.Listen("tcp", ":3030")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer listener.Close()
-
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			log.Fatal(err)
-		}
-		if _, err := conn.Read(buffer); err != nil || err == io.EOF {
-			break
-		}
-		fmt.Printf("%s", string(buffer))
-		conn.Close()
-	}
+	reverseProxy := renzofsreverseproxy.NewReverseProxyServer("localhost", "tcp", ":5050", ":6060")
+	reverseProxy.StartListenForClient()
 }

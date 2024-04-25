@@ -9,8 +9,10 @@ package renzofsreverseproxy
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"net"
+	"net/http"
 	"strings"
 )
 
@@ -22,7 +24,6 @@ type RenzoFSReverseProxy struct {
 	// contain servers to ruote
 	// request to
 	serverPool []ServerPool
-	clientConn net.Conn
 	serverConn net.Conn
 }
 
@@ -41,14 +42,13 @@ type ServerPool struct {
 // this function set-up a new reverse proxy server
 // by passing as arguments the ip adress and the
 // port by witch the server can start
-func (s *RenzoFSReverseProxy) NewReverseProxyServer(ipAddress, tcpInfo, clientListenPort, serverListenPort string) *RenzoFSReverseProxy {
+func NewReverseProxyServer(ipAddress, tcpInfo, clientListenPort, serverListenPort string) *RenzoFSReverseProxy {
 	return &RenzoFSReverseProxy{
 		IPaddress:            ipAddress,
 		ListenPortForClient:  clientListenPort,
 		ListenPortForServers: serverListenPort,
 		TCPInfo:              tcpInfo,
 		serverPool:           make([]ServerPool, 0),
-		clientConn:           nil,
 		serverConn:           nil,
 	}
 }
@@ -56,21 +56,10 @@ func (s *RenzoFSReverseProxy) NewReverseProxyServer(ipAddress, tcpInfo, clientLi
 // this method make the server listen to
 // incoming request from clients
 func (s *RenzoFSReverseProxy) StartListenForClient() {
-	var err error
-	completeAddress := makeEntireReverseProxyServerAddress(s.ListenPortForClient, s.IPaddress)
-	listener, err := net.Listen(s.TCPInfo, completeAddress)
-	if err != nil {
-		log.Fatal(err)
-	}
+	internalRouter := http.NewServeMux()
+	internalRouter.HandleFunc("/", s.handleRequests)
 
-	for {
-		s.clientConn, err = listener.Accept()
-		if err != nil {
-			log.Fatal(err)
-			break
-		}
-		go handleRequests(s.clientConn)
-	}
+	http.ListenAndServe(s.ListenPortForClient, internalRouter)
 }
 
 // this method make the server listen
@@ -97,15 +86,41 @@ func (s *RenzoFSReverseProxy) StartListenForServers() {
 // this method close the connection beetwen
 // the reverse proxy server to clients and
 // other servers
-func (s *RenzoFSReverseProxy) CloseAll() {
-	s.clientConn.Close()
+func (s *RenzoFSReverseProxy) Close() {
 	s.serverConn.Close()
 }
 
 // this function enable reverse proxy server
-// to handle both clients and server request
-func handleRequests(conn net.Conn) {
-	// TODO
+// to handle both clients requests
+func (s *RenzoFSReverseProxy) handleRequests(w http.ResponseWriter, r *http.Request) {
+	var (
+		targetServerAddrr, targetServerPort string
+	)
+	// read the request
+	url := strings.Split(r.URL.Path, "/")
+	endpoint := url[0]
+	for index := range s.serverPool {
+		if s.serverPool[index].endpoint == endpoint {
+			targetServerAddrr = s.serverPool[index].IPaddress
+			targetServerPort = s.serverPool[index].port
+		}
+	}
+	// impostare errore se non c'è l'endpoint richiesto
+
+	// now a swing the informations
+	r.URL.Host = net.JoinHostPort(targetServerAddrr, targetServerPort)
+
+	// send the request to the correct service
+	targetServiceResponse, err := http.DefaultClient.Do(r)
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(http.StatusBadGateway)
+		w.Write([]byte(err.Error()))
+	}
+
+	w.WriteHeader(targetServiceResponse.StatusCode)
+	w.Header().Set("Content-Type", targetServiceResponse.Header.Get("Content-Type"))
+	io.Copy(w, targetServiceResponse.Body)
 }
 
 // this function must control if the
