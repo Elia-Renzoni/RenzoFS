@@ -17,11 +17,15 @@ type CreateDirPayLoad struct {
 	DirToCreate string `json:"dir_to_create"`
 	controller  *ResourceController
 	messages    *ResponseMessages
+	logger      *RenzoFSCustomLogger
 }
 
 func (c *CreateDirPayLoad) HandleDirCreation(w http.ResponseWriter, r *http.Request) {
 	c.messages = getInstance()
 	c.controller = getResourceControllerInstance()
+	c.logger = GetRenzoFSCustomLogger()
+	c.logger.OpenLogFile()
+
 	if r.Method != http.MethodPost {
 		json, _ := c.messages.MarshalErrMessage("Method Not Allowed")
 		handleCreateDirResponse(w, methodNotAllowed, json)
@@ -44,6 +48,7 @@ func (c *CreateDirPayLoad) HandleDirCreation(w http.ResponseWriter, r *http.Requ
 		} else {
 			handleCreateDirResponse(w, clientSucces, json)
 		}
+		c.logger.WriteInLogFile("Created " + c.DirToCreate + " a new directory added to RenzoFS")
 	}
 }
 

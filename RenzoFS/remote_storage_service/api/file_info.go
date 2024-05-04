@@ -18,6 +18,7 @@ type FileInfo struct {
 	dirName    string
 	controller *ResourceController
 	messages   *ResponseMessages
+	logger     *RenzoFSCustomLogger
 }
 
 func (f *FileInfo) HandleFileInfo(w http.ResponseWriter, r *http.Request) {
@@ -27,6 +28,10 @@ func (f *FileInfo) HandleFileInfo(w http.ResponseWriter, r *http.Request) {
 	f.dirName = tmpSlice[2]             // dirname
 	f.controller = getResourceControllerInstance()
 	f.messages = getInstance()
+
+	f.logger = GetRenzoFSCustomLogger()
+	f.logger.OpenLogFile()
+
 	if r.Method != http.MethodGet {
 		json, err := f.messages.MarshalErrMessage("Method Not Valid")
 		if err != nil {
@@ -55,6 +60,7 @@ func (f *FileInfo) HandleFileInfo(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), 500)
 			} else {
 				handleFileInfoResponse(w, clientSucces, json)
+				f.logger.WriteInLogFile("Readed file information from " + f.dirName + "/" + f.fileName + " in RenzoFS")
 			}
 		}
 	}

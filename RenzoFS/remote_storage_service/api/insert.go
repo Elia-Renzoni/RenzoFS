@@ -30,6 +30,7 @@ type InsertPayLoad struct {
 	// composition fields
 	messages  *ResponseMessages
 	resources *ResourceController
+	logger    *RenzoFSCustomLogger
 }
 
 // this method handle the POST operation thath is
@@ -38,6 +39,9 @@ type InsertPayLoad struct {
 func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) {
 	i.messages = getInstance()
 	i.resources = getResourceControllerInstance()
+	i.logger = GetRenzoFSCustomLogger()
+	i.logger.OpenLogFile()
+
 	if r.Method != http.MethodPost {
 		json, err := i.messages.MarshalErrMessage("Method Not Allowed")
 		if err != nil {
@@ -64,6 +68,7 @@ func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) 
 				http.Error(w, err.Error(), 500)
 			} else {
 				handleInsertResponse(w, clientSucces, jsonMessage)
+				i.logger.WriteInLogFile("Added new file content to " + i.User + "/" + i.FileName + " in RenzoFS")
 			}
 		}
 	}

@@ -23,6 +23,8 @@ type ReadPayLoad struct {
 	// composition fields
 	controller *ResourceController
 	messages   *ResponseMessages
+
+	logger *RenzoFSCustomLogger
 }
 
 // this method handle the GET crud operation
@@ -36,6 +38,10 @@ func (r *ReadPayLoad) HandleRead(w http.ResponseWriter, req *http.Request) {
 	r.url = req.URL.Query()         // get the url query section
 	r.controller = getResourceControllerInstance()
 	r.messages = getInstance()
+
+	r.logger = GetRenzoFSCustomLogger()
+	r.logger.OpenLogFile()
+
 	if req.Method != http.MethodGet {
 		json, err := r.messages.MarshalErrMessage("Method Not Allowed")
 		if err != nil {
@@ -56,6 +62,7 @@ func (r *ReadPayLoad) HandleRead(w http.ResponseWriter, req *http.Request) {
 				http.Error(w, err.Error(), 500)
 			}
 			handleGetResponses(w, clientSucces, json)
+			r.logger.WriteInLogFile("Readed file informations from " + r.user + "/" + r.fileName + " in RenzoFS")
 		}
 	}
 }

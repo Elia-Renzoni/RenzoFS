@@ -16,6 +16,7 @@ type DeleteDirPayLoad struct {
 	dirToDelete string
 	controller  *ResourceController
 	messages    *ResponseMessages
+	logger      *RenzoFSCustomLogger
 }
 
 func (d *DeleteDirPayLoad) HandleDirElimination(w http.ResponseWriter, r *http.Request) {
@@ -25,6 +26,10 @@ func (d *DeleteDirPayLoad) HandleDirElimination(w http.ResponseWriter, r *http.R
 	fmt.Printf("%v", d.dirToDelete)
 	d.controller = getResourceControllerInstance()
 	d.messages = getInstance()
+
+	d.logger = GetRenzoFSCustomLogger()
+	d.logger.OpenLogFile()
+
 	if r.Method != http.MethodDelete {
 		json, err := d.messages.MarshalErrMessage("Method Not Allowed")
 		if err != nil {
@@ -47,6 +52,7 @@ func (d *DeleteDirPayLoad) HandleDirElimination(w http.ResponseWriter, r *http.R
 			} else {
 				handleDeleteDirResponse(w, clientSucces, json)
 			}
+			d.logger.WriteInLogFile("Deleted " + d.dirToDelete + " directory from RenzoFS File System")
 		}
 	}
 }

@@ -11,11 +11,15 @@ type DeletePayLoad struct {
 	url            url.Values
 	controller     *ResourceController
 	messages       *ResponseMessages
+	logger         *RenzoFSCustomLogger
 }
 
 func (d *DeletePayLoad) HandleDelete(w http.ResponseWriter, r *http.Request) {
 	d.controller = getResourceControllerInstance()
 	d.messages = getInstance()
+	d.logger = GetRenzoFSCustomLogger()
+	d.logger.OpenLogFile()
+
 	tmp := r.URL.Path
 	tmp2 := strings.Split(tmp, "/")
 	d.user = tmp2[2]
@@ -40,6 +44,7 @@ func (d *DeletePayLoad) HandleDelete(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), 500)
 			}
 			handleDeleteResponses(w, clientSucces, json)
+			d.logger.WriteInLogFile("Delete from " + d.user + " a file called " + d.fileName + " in RenzoFS")
 		}
 	}
 }
