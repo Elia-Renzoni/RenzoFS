@@ -1,0 +1,5 @@
+ID,Data,Simbolo Titolo,Nome Titolo,Quantità,Prezzo,Valore Totale,Commissione,Tipo Transazione
+1,2024-02-01,AAPL,Apple Inc.,100,"150.00,00","15.000,00",10.00,Acquisto
+2,2024-03-08,GOOG,Alphabet Inc.,50,"2.000,00","100.000,00",25.00,Acquisto
+3,2024-04-12,AMZN,"Amazon.com, Inc.",20,"3.500,00","70.000,00",15.00,Vendita
+4,2024-05-09,MSFT,Microsoft Corporation,30,180.00.00,"5.400,00",12.00,Acquisto

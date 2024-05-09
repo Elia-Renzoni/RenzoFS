@@ -1,0 +1,4 @@
+INFO2024/05/09 18:04:42 renzofs_custom_logger.go:48: Created LavaLaRue a new directory added to RenzoFS
+INFO2024/05/09 18:05:14 renzofs_custom_logger.go:48: Created NerDando a new directory added to RenzoFS
+INFO2024/05/09 18:05:54 renzofs_custom_logger.go:48: Created Freneh a new directory added to RenzoFS
+INFO2024/05/09 18:06:18 renzofs_custom_logger.go:48: Created Incognito a new directory added to RenzoFS

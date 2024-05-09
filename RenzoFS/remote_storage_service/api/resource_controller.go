@@ -51,7 +51,7 @@ func getResourceControllerInstance() *ResourceController {
 }
 
 func (r *ResourceController) CreateNewDir(dirname string) error {
-	if err := os.Mkdir(filepath.Join("local_file_system", dirname), os.ModeDir); err != nil {
+	if err := os.Mkdir(filepath.Join("E:/RenzoFS", "local_file_system", dirname), os.ModeDir); err != nil {
 		return err
 	}
 	return nil
@@ -352,7 +352,7 @@ func changeWorkerDirectory(dirname string) error {
 	switch {
 	case dirname != "":
 		for {
-			if err := os.Chdir(filepath.Join("local_file_system", dirname)); err != nil {
+			if err := os.Chdir(filepath.Join("E:/RenzoFS", "local_file_system", dirname)); err != nil {
 				return err
 			} else {
 				break
@@ -360,7 +360,7 @@ func changeWorkerDirectory(dirname string) error {
 		}
 	case dirname == "":
 		for {
-			if err := os.Chdir(filepath.Join("local_file_system")); err != nil {
+			if err := os.Chdir(filepath.Join("E:/RenzoFS", "local_file_system")); err != nil {
 				return err
 			} else {
 				break
