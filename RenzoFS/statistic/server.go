@@ -10,5 +10,5 @@ func main() {
 	router := http.NewServeMux()
 	router.HandleFunc("/statistics", stat.HandleRead)
 
-	http.ListenAndServe(":4040", router)
+	http.ListenAndServe(":8081", router)
 }
