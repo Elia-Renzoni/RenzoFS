@@ -31,8 +31,8 @@ Query Format and API endpoints: <br>
 ```json
 {
   "query_type": "insert",
-  "user_name":"elia",
-  "destination": "myFile",
+  "user":"elia",
+  "file_name": "myFile",
   "query_content": ["value1", "44", "value2", "55.5"]
 }
 ```
