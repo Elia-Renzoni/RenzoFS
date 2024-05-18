@@ -6,7 +6,7 @@
 
 RenzoFS is a distributed file system that allows users to query their file, using json written query. <br>
 <br>
-The distributed service is written in Go (1.20) and uses REST protocol as communication model, ensuring a remote access model, instead of upload-download access model. <br>
+The distributed service is written in Go (1.20) and uses REST as communication model, ensuring a remote access model, instead of upload-download access model. <br>
 The main functionalities of the distributed service are: <br>
 |Functionality|
 |-------------|
