@@ -21,7 +21,9 @@ The main functionalities of the distributed service are: <br>
 |File sharing|
 
 ## API Gateway
-TODO
+RenzoFS is a microservice-based distributed file system, with remote access model, so an API Gateway plays a crucial role, <br>
+RenzoFS API Gateway allows to choose the correct backend service by looking requests. Also provide distributed security control as
+Cirtuit Breaking.
 
 ## Distributed Storage Service
 this micro service handles access to remote files and directories, allowing you to store new changes, such as removing files or directories, or even editing and reading files. <br>
