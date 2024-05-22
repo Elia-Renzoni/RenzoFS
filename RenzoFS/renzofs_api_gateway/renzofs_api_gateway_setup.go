@@ -9,6 +9,7 @@ package renzofsapigateway
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -72,55 +73,56 @@ func (re *RenzoFSAPIGateway) apiGatewayInnerHandler(w http.ResponseWriter, r *ht
 	// control endpoint
 	switch endpoint {
 	case REMOTE_STORAGE_S_INSERT:
-		if microservice, err = checkServerPool(re.serverPool, REMOTE_STORAGE_S_INSERT); err == nil {
-			service = parseURL(microservice)
-		} else {
+		if microservice, err = checkServerPool(re.serverPool, REMOTE_STORAGE_S_INSERT); err != nil {
 			handleAPIGatewayNegativeResponse(w, err)
+		} else {
+			service = parseURL(microservice)
 		}
 	case REMOTE_STORAGE_S_READ:
-		if microservice, err = checkServerPool(re.serverPool, REMOTE_STORAGE_S_READ); err == nil {
-			service = parseURL(microservice)
-		} else {
+		if microservice, err = checkServerPool(re.serverPool, REMOTE_STORAGE_S_READ); err != nil {
 			handleAPIGatewayNegativeResponse(w, err)
+		} else {
+			service = parseURL(microservice)
 		}
 	case REMOTE_STORAGE_S_DELETE:
-		if microservice, err = checkServerPool(re.serverPool, REMOTE_STORAGE_S_DELETE); err == nil {
-			service = parseURL(microservice)
-		} else {
+		if microservice, err = checkServerPool(re.serverPool, REMOTE_STORAGE_S_DELETE); err != nil {
 			handleAPIGatewayNegativeResponse(w, err)
+		} else {
+			service = parseURL(microservice)
 		}
 	case REMOTE_STORAGE_S_UPDATE:
-		if microservice, err = checkServerPool(re.serverPool, REMOTE_STORAGE_S_UPDATE); err == nil {
-			service = parseURL(microservice)
-		} else {
+		if microservice, err = checkServerPool(re.serverPool, REMOTE_STORAGE_S_UPDATE); err != nil {
 			handleAPIGatewayNegativeResponse(w, err)
+		} else {
+			service = parseURL(microservice)
 		}
 	case REMOTE_STORAGE_S_CREATEDIR:
-		if microservice, err = checkServerPool(re.serverPool, REMOTE_STORAGE_S_CREATEDIR); err == nil {
-			service = parseURL(microservice)
-		} else {
+		if microservice, err = checkServerPool(re.serverPool, REMOTE_STORAGE_S_CREATEDIR); err != nil {
 			handleAPIGatewayNegativeResponse(w, err)
+		} else {
+			service = parseURL(microservice)
 		}
 	case REMOTE_STORAGE_S_DELETEDIR:
-		if microservice, err = checkServerPool(re.serverPool, REMOTE_STORAGE_S_DELETEDIR); err == nil {
-			service = parseURL(microservice)
-		} else {
+		if microservice, err = checkServerPool(re.serverPool, REMOTE_STORAGE_S_DELETEDIR); err != nil {
 			handleAPIGatewayNegativeResponse(w, err)
+		} else {
+			service = parseURL(microservice)
 		}
 	case REMOTE_STORAGE_S_FILEINFO:
-		if microservice, err = checkServerPool(re.serverPool, REMOTE_STORAGE_S_FILEINFO); err == nil {
-			service = parseURL(microservice)
-		} else {
+		if microservice, err = checkServerPool(re.serverPool, REMOTE_STORAGE_S_FILEINFO); err != nil {
 			handleAPIGatewayNegativeResponse(w, err)
+		} else {
+			service = parseURL(microservice)
 		}
 	case STATSTIC_S_STATISCTIS:
-		if microservice, err = checkServerPool(re.serverPool, STATSTIC_S_STATISCTIS); err == nil {
-			service = parseURL(microservice)
-		} else {
+		if microservice, err = checkServerPool(re.serverPool, STATSTIC_S_STATISCTIS); err != nil {
 			handleAPIGatewayNegativeResponse(w, err)
+		} else {
+			service = parseURL(microservice)
 		}
 	default:
-		handleAPIGatewayNegativeResponse(w, err)
+		fmt.Printf("******")
+		handleAPIGatewayNegativeResponse(w, errors.New("Invalid Endpoint"))
 	}
 
 	// spwapping
