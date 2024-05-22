@@ -90,5 +90,5 @@ localhost:8080/fileinfo/{dirname}/{filename}
 Note that the structure of the file system starts from the root that is RenzoFS, so to move between the files and modify them was appropriate to change rempentinamente working directory
 
 ## Statistic Service
-TODO
+the statistics service is contacted by clients to know the latest statistical information about their files. The informations are contained in the log file held by the remote storage service. <br>
 ## Log-in Log-out Service
