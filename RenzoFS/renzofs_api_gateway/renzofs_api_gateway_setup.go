@@ -34,6 +34,9 @@ const (
 	REMOTE_STORAGE_S_FILEINFO  string = "fileinfo"
 
 	STATSTIC_S_STATISCTIS string = "statistics"
+
+	AUTHENTICATION_S_LOGIN  string = "login"
+	AUTHENTICATION_S_LOGOUT string = "logout"
 )
 
 func NewRenzoFSAPIGateway(host, port string) *RenzoFSAPIGateway {
@@ -116,6 +119,18 @@ func (re *RenzoFSAPIGateway) apiGatewayInnerHandler(w http.ResponseWriter, r *ht
 		}
 	case STATSTIC_S_STATISCTIS:
 		if microservice, err = checkServerPool(re.serverPool, STATSTIC_S_STATISCTIS); err != nil {
+			handleAPIGatewayNegativeResponse(w, err)
+		} else {
+			service = parseURL(microservice)
+		}
+	case AUTHENTICATION_S_LOGIN:
+		if microservice, err = checkServerPool(re.serverPool, AUTHENTICATION_S_LOGIN); err != nil {
+			handleAPIGatewayNegativeResponse(w, err)
+		} else {
+			service = parseURL(microservice)
+		}
+	case AUTHENTICATION_S_LOGOUT:
+		if microservice, err = checkServerPool(re.serverPool, AUTHENTICATION_S_LOGOUT); err != nil {
 			handleAPIGatewayNegativeResponse(w, err)
 		} else {
 			service = parseURL(microservice)

@@ -19,6 +19,8 @@ func main() {
 		"deletedir", "http://127.0.0.1:8080",
 		"createdir", "http://127.0.0.1:8080",
 		"fileinfo", "http://127.0.0.1:8080",
-		"statistics", "http://127.0.0.1:8081")
+		"statistics", "http://127.0.0.1:8081",
+		"login", "http://127.0.0.1:8082",
+		"logout", "http://127.0.0.1:8082")
 	apiGateway.StartListeningRequests()
 }
