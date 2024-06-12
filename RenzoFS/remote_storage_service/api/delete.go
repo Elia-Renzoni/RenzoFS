@@ -44,7 +44,7 @@ func (d *DeletePayLoad) HandleDelete(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), 500)
 			}
 			handleDeleteResponses(w, clientSucces, json)
-			d.logger.WriteInLogFile("Delete from " + d.user + " a file called " + d.fileName + " in RenzoFS")
+			d.logger.WriteInLogFile(http.MethodDelete + "\t" + d.user + "\t" + d.fileName)
 		}
 	}
 }

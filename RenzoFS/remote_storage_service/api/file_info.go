@@ -60,7 +60,7 @@ func (f *FileInfo) HandleFileInfo(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), 500)
 			} else {
 				handleFileInfoResponse(w, clientSucces, json)
-				f.logger.WriteInLogFile("Readed file information from " + f.dirName + "/" + f.fileName + " in RenzoFS")
+				f.logger.WriteInLogFile(http.MethodGet + "\t" + f.dirName + "\t" + f.fileName)
 			}
 		}
 	}

@@ -16,9 +16,11 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 type ResourceController struct {
+	mutex sync.Mutex
 }
 
 type PairChecker struct {

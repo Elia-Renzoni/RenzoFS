@@ -8,12 +8,17 @@
 package api
 
 import (
+	"bufio"
 	"log"
 	"os"
+	"strings"
+	"sync"
 )
 
 type RenzoFSCustomLogger struct {
 	InfoLogger *log.Logger
+	// TODO
+	mutex sync.Mutex
 }
 
 var customLoggerLocalInstance *RenzoFSCustomLogger
@@ -37,7 +42,7 @@ func setUpRenzoFSCustomLogger() *log.Logger {
 	if err != nil {
 		panic(err)
 	}
-	return log.New(file, "INFO", log.Ldate|log.Ltime|log.Lshortfile)
+	return log.New(file, "INFO\t", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
 func (l *RenzoFSCustomLogger) OpenLogFile() {
@@ -46,4 +51,32 @@ func (l *RenzoFSCustomLogger) OpenLogFile() {
 
 func (l *RenzoFSCustomLogger) WriteInLogFile(message string) {
 	l.InfoLogger.Println(message)
+}
+
+func (l *RenzoFSCustomLogger) SearchInLogFile(dir, filename string) ([]string, error) {
+	var response []string = make([]string, 0)
+	file, err := os.Open("renzo_fs_log.txt")
+	if err != nil {
+		return nil, err
+	}
+
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	// read lines
+	for scanner.Scan() {
+		splittedContent := strings.Split(scanner.Text(), "\t")
+		for index := range splittedContent {
+			if splittedContent[index] == dir || splittedContent[index] == filename {
+				response = append(response, scanner.Text())
+			}
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }

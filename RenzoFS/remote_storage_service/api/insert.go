@@ -68,7 +68,7 @@ func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) 
 				http.Error(w, err.Error(), 500)
 			} else {
 				handleInsertResponse(w, clientSucces, jsonMessage)
-				i.logger.WriteInLogFile("Added new file content to " + i.User + "/" + i.FileName + " in RenzoFS")
+				i.logger.WriteInLogFile(http.MethodPost + "\t" + i.User + "\t" + i.FileName)
 			}
 		}
 	}

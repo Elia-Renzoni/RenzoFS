@@ -62,7 +62,7 @@ func (r *ReadPayLoad) HandleRead(w http.ResponseWriter, req *http.Request) {
 				http.Error(w, err.Error(), 500)
 			}
 			handleGetResponses(w, clientSucces, json)
-			r.logger.WriteInLogFile("Readed file informations from " + r.user + "/" + r.fileName + " in RenzoFS")
+			r.logger.WriteInLogFile(http.MethodGet + "\t" + r.user + "\t" + r.fileName)
 		}
 	}
 }

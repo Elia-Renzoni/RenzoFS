@@ -1,7 +1,7 @@
 /**
 *	@author Elia Renzoni
 *	@date 02/02/2024
-*	@brief Response Marshaller
+*	@brief Response Marshaler
 **/
 
 package api
@@ -60,5 +60,10 @@ func (r *ResponseMessages) MarshalSuccessFileInformations(messages [3]string) (j
 
 func (r *ResponseMessages) MarshalSuccesReadResults(messageToEncode map[string]string) (jsonSuccessMessage []byte, err error) {
 	jsonSuccessMessage, err = json.Marshal(messageToEncode)
+	return
+}
+
+func (r *ResponseMessages) MarshalSuccesStatResults(messageToEncode []string) (jsonSuccessMessage []byte, err error) {
+
 	return
 }

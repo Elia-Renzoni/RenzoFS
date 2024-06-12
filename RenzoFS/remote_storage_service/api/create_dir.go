@@ -48,7 +48,7 @@ func (c *CreateDirPayLoad) HandleDirCreation(w http.ResponseWriter, r *http.Requ
 		} else {
 			handleCreateDirResponse(w, clientSucces, json)
 		}
-		c.logger.WriteInLogFile("Created " + c.DirToCreate + " a new directory added to RenzoFS")
+		c.logger.WriteInLogFile(http.MethodPost + "\t" + c.DirToCreate)
 	}
 }
 

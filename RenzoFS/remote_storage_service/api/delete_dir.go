@@ -52,7 +52,7 @@ func (d *DeleteDirPayLoad) HandleDirElimination(w http.ResponseWriter, r *http.R
 			} else {
 				handleDeleteDirResponse(w, clientSucces, json)
 			}
-			d.logger.WriteInLogFile("Deleted " + d.dirToDelete + " directory from RenzoFS File System")
+			d.logger.WriteInLogFile(http.MethodDelete + "\t" + d.dirToDelete)
 		}
 	}
 }

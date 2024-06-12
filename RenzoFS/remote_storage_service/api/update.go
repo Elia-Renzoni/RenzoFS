@@ -47,7 +47,7 @@ func (u *UpdatePayLoad) HandleUpdate(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), 500)
 			} else {
 				handleUpdateResponses(w, clientSucces, json)
-				u.logger.WriteInLogFile("Update file informations from " + u.User + "/" + u.FileName + " in RenzoFS")
+				u.logger.WriteInLogFile(http.MethodPatch + " " + u.User + " " + u.FileName)
 			}
 		}
 	}
