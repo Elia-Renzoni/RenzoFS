@@ -25,6 +25,9 @@ RenzoFS is a microservice-based distributed file system, with remote access mode
 RenzoFS API Gateway allows to choose the correct backend service by looking requests. Also provide distributed security control as
 Cirtuit Breaking.
 
+Server-Side Discovery <br>
+
+
 ## Distributed Storage Service
 this micro service handles access to remote files and directories, allowing you to store new changes, such as removing files or directories, or even editing and reading files. <br>
 Query Format and API endpoints: <br>
