@@ -21,10 +21,9 @@ type ReadPayLoad struct {
 	url url.Values // map[string][]string
 
 	// composition fields
-	controller *ResourceController
-	messages   *ResponseMessages
-
-	logger *RenzoFSCustomLogger
+	ResourceController
+	ResponseMessages
+	RenzoFSCustomLogger
 }
 
 // this method handle the GET crud operation
@@ -36,33 +35,30 @@ func (r *ReadPayLoad) HandleRead(w http.ResponseWriter, req *http.Request) {
 	r.user = tmp2[2]                // user
 	r.fileName = tmp2[3]            // filename
 	r.url = req.URL.Query()         // get the url query section
-	r.controller = getResourceControllerInstance()
-	r.messages = getInstance()
 
-	r.logger = GetRenzoFSCustomLogger()
-	r.logger.OpenLogFile()
+	r.OpenLogFile()
 
 	if req.Method != http.MethodGet {
-		json, err := r.messages.MarshalErrMessage("Method Not Allowed")
+		json, err := r.MarshalErrMessage("Method Not Allowed")
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 		}
 		handleGetResponses(w, methodNotAllowed, json)
 	} else {
-		responseToEncode, err := r.controller.ReadInRemoteCSV(r.user, r.fileName, "read", r.url)
+		responseToEncode, err := r.ReadInRemoteCSV(r.user, r.fileName, "read", r.url)
 		if err != nil {
-			json, err := r.messages.MarshalErrMessage(err.Error())
+			json, err := r.MarshalErrMessage(err.Error())
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 			}
 			handleGetResponses(w, serverError, json)
 		} else {
-			json, err := r.messages.MarshalSuccesReadResults(responseToEncode)
+			json, err := r.MarshalSuccesReadResults(responseToEncode)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 			}
 			handleGetResponses(w, clientSucces, json)
-			r.logger.WriteInLogFile(http.MethodGet + "\t" + r.user + "\t" + r.fileName)
+			r.WriteInLogFile(http.MethodGet + "\t" + r.user + "\t" + r.fileName)
 		}
 	}
 }

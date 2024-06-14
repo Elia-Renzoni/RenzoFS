@@ -21,28 +21,12 @@ type RenzoFSCustomLogger struct {
 	mutex sync.Mutex
 }
 
-var customLoggerLocalInstance *RenzoFSCustomLogger
-
-func newRenzoFSCustomLogger() *RenzoFSCustomLogger {
-	return &RenzoFSCustomLogger{
-		InfoLogger: setUpRenzoFSCustomLogger(),
-	}
-}
-
-// singelton
-func GetRenzoFSCustomLogger() *RenzoFSCustomLogger {
-	if customLoggerLocalInstance == nil {
-		customLoggerLocalInstance = newRenzoFSCustomLogger()
-	}
-	return customLoggerLocalInstance
-}
-
-func setUpRenzoFSCustomLogger() *log.Logger {
+func (l *RenzoFSCustomLogger) SetUpRenzoFSCustomLogger() {
 	var file, err = os.Create("renzo_fs_log.txt")
 	if err != nil {
 		panic(err)
 	}
-	return log.New(file, "INFO\t", log.Ldate|log.Ltime|log.Lshortfile)
+	l.InfoLogger = log.New(file, "INFO\t", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
 func (l *RenzoFSCustomLogger) OpenLogFile() {

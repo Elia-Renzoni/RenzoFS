@@ -11,20 +11,16 @@ type UpdatePayLoad struct {
 	User         string              `json:"user_name"`
 	FileName     string              `json:"file_name"`
 	QueryContent map[string][]string `json:"query_content"`
-	controller   *ResourceController
-	messages     *ResponseMessages
-
-	logger *RenzoFSCustomLogger
+	ResourceController
+	ResponseMessages
+	RenzoFSCustomLogger
 }
 
 func (u *UpdatePayLoad) HandleUpdate(w http.ResponseWriter, r *http.Request) {
-	u.controller = getResourceControllerInstance()
-	u.messages = getInstance()
-	u.logger = GetRenzoFSCustomLogger()
-	u.logger.OpenLogFile()
+	u.OpenLogFile()
 
 	if r.Method != http.MethodPatch {
-		json, err := u.messages.MarshalErrMessage("Method Not Allowed")
+		json, err := u.MarshalErrMessage("Method Not Allowed")
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 		}
@@ -33,21 +29,21 @@ func (u *UpdatePayLoad) HandleUpdate(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		reqBody, _ := io.ReadAll(r.Body)
 		json.Unmarshal(reqBody, u)
-		err := u.controller.UpdateRemoteCSV(u.User, u.FileName, u.QueryType, u.QueryContent)
+		err := u.UpdateRemoteCSV(u.User, u.FileName, u.QueryType, u.QueryContent)
 		if err != nil {
-			json, err := u.messages.MarshalErrMessage(err.Error())
+			json, err := u.MarshalErrMessage(err.Error())
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 			} else {
 				handleUpdateResponses(w, serverError, json)
 			}
 		} else {
-			json, err := u.messages.Marshalsuccess("Informations Succesfully Updated")
+			json, err := u.Marshalsuccess("Informations Succesfully Updated")
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 			} else {
 				handleUpdateResponses(w, clientSucces, json)
-				u.logger.WriteInLogFile(http.MethodPatch + " " + u.User + " " + u.FileName)
+				u.WriteInLogFile(http.MethodPatch + " " + u.User + " " + u.FileName)
 			}
 		}
 	}

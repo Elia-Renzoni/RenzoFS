@@ -7,30 +7,29 @@ import (
 
 type StatsPayload struct {
 	dirName, fileName string
-	messages          *ResponseMessages
-	renzoLogger       *RenzoFSCustomLogger
+	ResponseMessages
+	RenzoFSCustomLogger
 }
 
 func (s *StatsPayload) HandleStats(w http.ResponseWriter, r *http.Request) {
-	s.messages = getInstance()
-	s.renzoLogger = newRenzoFSCustomLogger()
 	parameters := strings.Split(r.URL.Path, "/")
 	s.dirName = parameters[2]
 	s.fileName = parameters[3]
+	s.OpenLogFile()
 
 	if r.Method != http.MethodGet {
-		json, err := s.messages.MarshalErrMessage("Method Not Allowed")
+		json, err := s.MarshalErrMessage("Method Not Allowed")
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 		} else {
 			handleStatsResponses(w, methodNotAllowed, json)
 		}
 	} else {
-		response, err := s.renzoLogger.SearchInLogFile(s.dirName, s.fileName)
+		response, err := s.SearchInLogFile(s.dirName, s.fileName)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 		} else {
-			json, err := s.messages.MarshalSuccesStatResults(response)
+			json, err := s.MarshalSuccesStatResults(response)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 			} else {

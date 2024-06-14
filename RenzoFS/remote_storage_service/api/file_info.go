@@ -14,11 +14,11 @@ import (
 )
 
 type FileInfo struct {
-	fileName   string
-	dirName    string
-	controller *ResourceController
-	messages   *ResponseMessages
-	logger     *RenzoFSCustomLogger
+	fileName string
+	dirName  string
+	ResourceController
+	ResponseMessages
+	RenzoFSCustomLogger
 }
 
 func (f *FileInfo) HandleFileInfo(w http.ResponseWriter, r *http.Request) {
@@ -26,23 +26,20 @@ func (f *FileInfo) HandleFileInfo(w http.ResponseWriter, r *http.Request) {
 	tmpSlice := strings.Split(tmp, "/") // [fileinfo, user, filename]
 	f.fileName = tmpSlice[3]            // filename
 	f.dirName = tmpSlice[2]             // dirname
-	f.controller = getResourceControllerInstance()
-	f.messages = getInstance()
 
-	f.logger = GetRenzoFSCustomLogger()
-	f.logger.OpenLogFile()
+	f.OpenLogFile()
 
 	if r.Method != http.MethodGet {
-		json, err := f.messages.MarshalErrMessage("Method Not Valid")
+		json, err := f.MarshalErrMessage("Method Not Valid")
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 		} else {
 			handleFileInfoResponse(w, methodNotAllowed, json)
 		}
 	} else {
-		fileInfo, err := f.controller.GetFileInformations(f.dirName, f.fileName)
+		fileInfo, err := f.GetFileInformations(f.dirName, f.fileName)
 		if err != nil {
-			json, err := f.messages.MarshalErrMessage(err.Error())
+			json, err := f.MarshalErrMessage(err.Error())
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 			} else {
@@ -55,12 +52,12 @@ func (f *FileInfo) HandleFileInfo(w http.ResponseWriter, r *http.Request) {
 				strconv.Itoa(int(fileInfo.Size())),
 				fileInfo.ModTime().GoString(),
 			}
-			json, err := f.messages.MarshalSuccessFileInformations(messageInfo)
+			json, err := f.MarshalSuccessFileInformations(messageInfo)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 			} else {
 				handleFileInfoResponse(w, clientSucces, json)
-				f.logger.WriteInLogFile(http.MethodGet + "\t" + f.dirName + "\t" + f.fileName)
+				f.WriteInLogFile(http.MethodGet + "\t" + f.dirName + "\t" + f.fileName)
 			}
 		}
 	}

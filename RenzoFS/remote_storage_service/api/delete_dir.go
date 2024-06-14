@@ -14,9 +14,9 @@ import (
 
 type DeleteDirPayLoad struct {
 	dirToDelete string
-	controller  *ResourceController
-	messages    *ResponseMessages
-	logger      *RenzoFSCustomLogger
+	ResourceController
+	ResponseMessages
+	RenzoFSCustomLogger
 }
 
 func (d *DeleteDirPayLoad) HandleDirElimination(w http.ResponseWriter, r *http.Request) {
@@ -24,35 +24,32 @@ func (d *DeleteDirPayLoad) HandleDirElimination(w http.ResponseWriter, r *http.R
 	tmp2 := strings.Split(tmp, "/") // [deletedir, dirname]
 	d.dirToDelete = tmp2[2]         // dirname
 	fmt.Printf("%v", d.dirToDelete)
-	d.controller = getResourceControllerInstance()
-	d.messages = getInstance()
 
-	d.logger = GetRenzoFSCustomLogger()
-	d.logger.OpenLogFile()
+	d.OpenLogFile()
 
 	if r.Method != http.MethodDelete {
-		json, err := d.messages.MarshalErrMessage("Method Not Allowed")
+		json, err := d.MarshalErrMessage("Method Not Allowed")
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 		} else {
 			handleDeleteDirResponse(w, methodNotAllowed, json)
 		}
 	} else {
-		if err := d.controller.DeleteDir(d.dirToDelete); err != nil {
-			json, err := d.messages.MarshalErrMessage(err.Error())
+		if err := d.DeleteDir(d.dirToDelete); err != nil {
+			json, err := d.MarshalErrMessage(err.Error())
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 			} else {
 				handleDeleteDirResponse(w, serverError, json)
 			}
 		} else {
-			json, err := d.messages.Marshalsuccess(d.dirToDelete + " Has Been Deleted")
+			json, err := d.Marshalsuccess(d.dirToDelete + " Has Been Deleted")
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 			} else {
 				handleDeleteDirResponse(w, clientSucces, json)
 			}
-			d.logger.WriteInLogFile(http.MethodDelete + "\t" + d.dirToDelete)
+			d.WriteInLogFile(http.MethodDelete + "\t" + d.dirToDelete)
 		}
 	}
 }

@@ -28,22 +28,19 @@ type InsertPayLoad struct {
 	QueryContent []string `json:"query_content"`
 
 	// composition fields
-	messages  *ResponseMessages
-	resources *ResourceController
-	logger    *RenzoFSCustomLogger
+	ResponseMessages
+	ResourceController
+	RenzoFSCustomLogger
 }
 
 // this method handle the POST operation thath is
 // related to the insertion of new information to
 // the specified file
 func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) {
-	i.messages = getInstance()
-	i.resources = getResourceControllerInstance()
-	i.logger = GetRenzoFSCustomLogger()
-	i.logger.OpenLogFile()
+	i.OpenLogFile()
 
 	if r.Method != http.MethodPost {
-		json, err := i.messages.MarshalErrMessage("Method Not Allowed")
+		json, err := i.MarshalErrMessage("Method Not Allowed")
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 		} else {
@@ -54,21 +51,21 @@ func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) 
 		defer r.Body.Close()
 		reqBody, _ := io.ReadAll(r.Body)
 		json.Unmarshal(reqBody, i)
-		err := i.resources.WriteRemoteCSV(i.User, i.FileName, i.QueryType, i.QueryContent)
+		err := i.WriteRemoteCSV(i.User, i.FileName, i.QueryType, i.QueryContent)
 		if err != nil {
-			jsonMessage, err := i.messages.MarshalErrMessage(err.Error())
+			jsonMessage, err := i.MarshalErrMessage(err.Error())
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 			} else {
 				handleInsertResponse(w, serverError, jsonMessage)
 			}
 		} else {
-			jsonMessage, err := i.messages.Marshalsuccess("information successfully added")
+			jsonMessage, err := i.Marshalsuccess("information successfully added")
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 			} else {
 				handleInsertResponse(w, clientSucces, jsonMessage)
-				i.logger.WriteInLogFile(http.MethodPost + "\t" + i.User + "\t" + i.FileName)
+				i.WriteInLogFile(http.MethodPost + "\t" + i.User + "\t" + i.FileName)
 			}
 		}
 	}

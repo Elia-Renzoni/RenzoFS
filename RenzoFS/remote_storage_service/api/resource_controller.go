@@ -34,8 +34,6 @@ type changeWorkDir func(string) error
 // goes back to renzofs main dir
 type backToHomeDir func() error
 
-var resourceControllerInstace *ResourceController
-
 // crud operations
 const (
 	insert string = "insert"
@@ -43,14 +41,6 @@ const (
 	delete string = "delete"
 	read   string = "read"
 )
-
-// singleton pattern
-func getResourceControllerInstance() *ResourceController {
-	if resourceControllerInstace == nil {
-		return new(ResourceController)
-	}
-	return resourceControllerInstace
-}
 
 func (r *ResourceController) CreateNewDir(dirname string) error {
 	if err := os.Mkdir(filepath.Join("E:/RenzoFS", "local_file_system", dirname), os.ModeDir); err != nil {
@@ -73,6 +63,26 @@ func (r *ResourceController) DeleteDir(dirname string) error {
 	}
 
 	if err := os.Remove(dirname); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *ResourceController) DeleteFile(path string) error {
+	var (
+		firstDirChange changeWorkDir = changeWorkerDirectory
+		lastDirChange  backToHomeDir = changeToMainDirectory
+	)
+
+	defer lastDirChange()
+
+	// change to local_file_system
+	if err := firstDirChange(""); err != nil {
+		return err
+	}
+
+	if err := os.Remove(path); err != nil {
 		return err
 	}
 

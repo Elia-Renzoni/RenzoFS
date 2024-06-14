@@ -12,6 +12,11 @@ import (
 	"renzofs/remote_storage_service/api"
 )
 
+func init() {
+	logger := api.RenzoFSCustomLogger{}
+	logger.SetUpRenzoFSCustomLogger()
+}
+
 func main() {
 	insertion := &api.InsertPayLoad{}
 	read := &api.ReadPayLoad{}
@@ -21,6 +26,7 @@ func main() {
 	createDir := &api.CreateDirPayLoad{}
 	fileInfo := &api.FileInfo{}
 	stats := &api.StatsPayload{}
+	deleteFile := &api.DeleteFilePayLoad{}
 
 	handle := http.NewServeMux()
 	handle.HandleFunc("/insert", insertion.HandleInsertion)
@@ -31,6 +37,7 @@ func main() {
 	handle.HandleFunc("/createdir", createDir.HandleDirCreation)
 	handle.HandleFunc("/fileinfo/", fileInfo.HandleFileInfo)
 	handle.HandleFunc("/stats/", stats.HandleStats)
+	handle.HandleFunc("/deletefile/", deleteFile.HandleFileElimination)
 
 	http.ListenAndServe(":8080", handle)
 }

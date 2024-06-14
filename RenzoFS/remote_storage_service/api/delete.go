@@ -9,16 +9,13 @@ import (
 type DeletePayLoad struct {
 	user, fileName string
 	url            url.Values
-	controller     *ResourceController
-	messages       *ResponseMessages
-	logger         *RenzoFSCustomLogger
+	ResourceController
+	ResponseMessages
+	RenzoFSCustomLogger
 }
 
 func (d *DeletePayLoad) HandleDelete(w http.ResponseWriter, r *http.Request) {
-	d.controller = getResourceControllerInstance()
-	d.messages = getInstance()
-	d.logger = GetRenzoFSCustomLogger()
-	d.logger.OpenLogFile()
+	d.OpenLogFile()
 
 	tmp := r.URL.Path
 	tmp2 := strings.Split(tmp, "/")
@@ -26,25 +23,25 @@ func (d *DeletePayLoad) HandleDelete(w http.ResponseWriter, r *http.Request) {
 	d.fileName = tmp2[3]
 	d.url = r.URL.Query()
 	if r.Method != http.MethodDelete {
-		json, err := d.messages.MarshalErrMessage("Method Not Allowed")
+		json, err := d.MarshalErrMessage("Method Not Allowed")
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 		}
 		handleDeleteResponses(w, methodNotAllowed, json)
 	} else {
-		if err := d.controller.DeleteRemoteCSV(d.user, d.fileName, "delete", d.url); err != nil {
-			json, err := d.messages.MarshalErrMessage(err.Error())
+		if err := d.DeleteRemoteCSV(d.user, d.fileName, "delete", d.url); err != nil {
+			json, err := d.MarshalErrMessage(err.Error())
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 			}
 			handleDeleteResponses(w, serverError, json)
 		} else {
-			json, err := d.messages.Marshalsuccess("Informations succesfully eliminated")
+			json, err := d.Marshalsuccess("Informations succesfully eliminated")
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 			}
 			handleDeleteResponses(w, clientSucces, json)
-			d.logger.WriteInLogFile(http.MethodDelete + "\t" + d.user + "\t" + d.fileName)
+			d.WriteInLogFile(http.MethodDelete + "\t" + d.user + "\t" + d.fileName)
 		}
 	}
 }
