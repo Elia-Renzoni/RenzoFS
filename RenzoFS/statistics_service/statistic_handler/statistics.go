@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
+	"path"
 	"strings"
-	"time"
 )
 
 type StatPayLoadstruct struct {
@@ -16,26 +15,15 @@ type StatPayLoadstruct struct {
 func (s *StatPayLoadstruct) HandleRead(w http.ResponseWriter, r *http.Request) {
 	requestPath := r.URL.Path
 	splittedRequest := strings.Split(requestPath, "/")
-	s.dirname = splittedRequest[1]
-	s.filename = splittedRequest[2]
+	s.dirname = splittedRequest[2]
+	s.filename = splittedRequest[3]
 	fmt.Printf("%v - %v ", s.dirname, s.filename)
 
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	} else {
-		// contact the remote storage service
-		transport := &http.Transport{
-			IdleConnTimeout: 30 * time.Second,
-		}
-		microservice := http.Client{
-			Transport: transport,
-		}
-		result, err := url.JoinPath("localhot:8080", "/read", s.dirname, s.filename)
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-		}
-
-		resp, err := microservice.Get(result)
+		fmt.Printf(path.Join("localhost:8080", "stats", s.dirname, s.filename))
+		resp, err := http.Get(path.Join("localhost:8080", "stats", s.dirname, s.filename))
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 		}

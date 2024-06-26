@@ -69,26 +69,6 @@ func (r *ResourceController) DeleteDir(dirname string) error {
 	return nil
 }
 
-func (r *ResourceController) DeleteFile(path string) error {
-	var (
-		firstDirChange changeWorkDir = changeWorkerDirectory
-		lastDirChange  backToHomeDir = changeToMainDirectory
-	)
-
-	defer lastDirChange()
-
-	// change to local_file_system
-	if err := firstDirChange(""); err != nil {
-		return err
-	}
-
-	if err := os.Remove(path); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (r *ResourceController) GetFileInformations(dirname, filename string) (os.FileInfo, error) {
 	var (
 		fileInfo    os.FileInfo
@@ -108,6 +88,25 @@ func (r *ResourceController) GetFileInformations(dirname, filename string) (os.F
 		return fileInfo, err
 	}
 	return fileInfo, nil
+}
+
+func (r *ResourceController) DeleteFile(dirname, filename string) error {
+	var (
+		firstDirChange changeWorkDir = changeWorkerDirectory
+		lastDirChange  backToHomeDir = changeToMainDirectory
+	)
+
+	defer lastDirChange()
+
+	if err := firstDirChange(dirname); err != nil {
+		return err
+	}
+
+	if err := os.Remove(filename); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *ResourceController) WriteRemoteCSV(dir, filename, queryType string, query []string) error {
@@ -278,6 +277,11 @@ func (r *ResourceController) UpdateRemoteCSV(dir, filename, queryType string, qu
 		}
 	}
 
+	// file truncation to show updates without redundancy
+	if trErr := os.Truncate(filename, 0); trErr != nil {
+		return trErr
+	}
+
 	writer := csv.NewWriter(file)
 	if err := writer.WriteAll(fileContent); err != nil {
 		return err
@@ -350,6 +354,11 @@ func (r *ResourceController) DeleteRemoteCSV(dir, filename, queryType string, qu
 
 			}
 		}
+	}
+
+	// file truncation to avoid redundancy
+	if trErr := os.Truncate(filename, 0); trErr != nil {
+		return trErr
 	}
 
 	writer := csv.NewWriter(file)

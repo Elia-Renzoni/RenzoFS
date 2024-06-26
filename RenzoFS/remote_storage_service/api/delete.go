@@ -15,13 +15,12 @@ type DeletePayLoad struct {
 }
 
 func (d *DeletePayLoad) HandleDelete(w http.ResponseWriter, r *http.Request) {
-	d.OpenLogFile()
-
 	tmp := r.URL.Path
 	tmp2 := strings.Split(tmp, "/")
 	d.user = tmp2[2]
 	d.fileName = tmp2[3]
 	d.url = r.URL.Query()
+
 	if r.Method != http.MethodDelete {
 		json, err := d.MarshalErrMessage("Method Not Allowed")
 		if err != nil {

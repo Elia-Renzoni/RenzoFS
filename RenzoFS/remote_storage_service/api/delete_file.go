@@ -1,45 +1,47 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
-	"path"
 	"strings"
 )
 
 type DeleteFilePayLoad struct {
-	dirName, fileName string
+	dirname, filename string
 	ResourceController
 	ResponseMessages
 	RenzoFSCustomLogger
 }
 
-func (d *DeleteFilePayLoad) HandleFileElimination(w http.ResponseWriter, r *http.Request) {
-	parameters := strings.Split(r.URL.Path, "/")
-	d.dirName = parameters[1]
-	d.fileName = parameters[2]
+func (df *DeleteFilePayLoad) HandleFileElimination(w http.ResponseWriter, r *http.Request) {
+	request := r.URL.Path
+	splittedRequest := strings.Split(request, "/")
+	df.dirname = splittedRequest[2]
+	df.filename = splittedRequest[3]
+	fmt.Printf("%v - %v", df.dirname, df.filename)
 
 	if r.Method != http.MethodDelete {
-		json, err := d.MarshalErrMessage("Method Not Allowed")
+		json, err := df.MarshalErrMessage("Method Not Allowed")
 		if err != nil {
 			http.Error(w, err.Error(), 500)
+		} else {
+			handleFileEliminationResponses(w, methodNotAllowed, json)
 		}
-		handleFileEliminationResponses(w, methodNotAllowed, json)
 	} else {
-		if err := d.DeleteFile(path.Join()); err != nil {
-			json, err := d.MarshalErrMessage(err.Error())
-			if err != nil {
-				http.Error(w, err.Error(), 500)
+		if err := df.DeleteFile(df.dirname, df.filename); err != nil {
+			json, errs := df.MarshalErrMessage(err.Error())
+			if errs != nil {
+				http.Error(w, errs.Error(), 500)
 			} else {
 				handleFileEliminationResponses(w, serverError, json)
 			}
 		} else {
-			json, err := d.Marshalsuccess(d.fileName + " Has Been Deleted")
+			json, err := df.Marshalsuccess("File Succesfully Deleted")
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 			} else {
 				handleFileEliminationResponses(w, clientSucces, json)
 			}
-			d.WriteInLogFile(http.MethodDelete + "\t" + d.fileName)
 		}
 	}
 }
@@ -48,7 +50,7 @@ func handleFileEliminationResponses(w http.ResponseWriter, id byte, jsonMessage 
 	switch id {
 	case methodNotAllowed:
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Content/Type", "application/json")
 		w.Write(jsonMessage)
 	case serverError:
 		w.WriteHeader(http.StatusInternalServerError)

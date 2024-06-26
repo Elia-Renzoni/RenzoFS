@@ -13,12 +13,11 @@ type UpdatePayLoad struct {
 	QueryContent map[string][]string `json:"query_content"`
 	ResourceController
 	ResponseMessages
+
 	RenzoFSCustomLogger
 }
 
 func (u *UpdatePayLoad) HandleUpdate(w http.ResponseWriter, r *http.Request) {
-	u.OpenLogFile()
-
 	if r.Method != http.MethodPatch {
 		json, err := u.MarshalErrMessage("Method Not Allowed")
 		if err != nil {

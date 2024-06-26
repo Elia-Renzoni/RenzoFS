@@ -15,7 +15,6 @@ func (s *StatsPayload) HandleStats(w http.ResponseWriter, r *http.Request) {
 	parameters := strings.Split(r.URL.Path, "/")
 	s.dirName = parameters[2]
 	s.fileName = parameters[3]
-	s.OpenLogFile()
 
 	if r.Method != http.MethodGet {
 		json, err := s.MarshalErrMessage("Method Not Allowed")

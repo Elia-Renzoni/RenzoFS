@@ -23,6 +23,7 @@ type ReadPayLoad struct {
 	// composition fields
 	ResourceController
 	ResponseMessages
+
 	RenzoFSCustomLogger
 }
 
@@ -35,8 +36,7 @@ func (r *ReadPayLoad) HandleRead(w http.ResponseWriter, req *http.Request) {
 	r.user = tmp2[2]                // user
 	r.fileName = tmp2[3]            // filename
 	r.url = req.URL.Query()         // get the url query section
-
-	r.OpenLogFile()
+	//	r.messages = getInstance()
 
 	if req.Method != http.MethodGet {
 		json, err := r.MarshalErrMessage("Method Not Allowed")

@@ -8,7 +8,7 @@ import (
 func main() {
 	stat := &statistichandler.StatPayLoadstruct{}
 	router := http.NewServeMux()
-	router.HandleFunc("/statistics", stat.HandleRead)
+	router.HandleFunc("/statistics/", stat.HandleRead)
 
 	http.ListenAndServe(":8081", router)
 }

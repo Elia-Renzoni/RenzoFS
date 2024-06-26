@@ -37,7 +37,6 @@ type InsertPayLoad struct {
 // related to the insertion of new information to
 // the specified file
 func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) {
-	i.OpenLogFile()
 
 	if r.Method != http.MethodPost {
 		json, err := i.MarshalErrMessage("Method Not Allowed")

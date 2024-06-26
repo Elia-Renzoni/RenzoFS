@@ -13,8 +13,8 @@ import (
 )
 
 func init() {
-	logger := api.RenzoFSCustomLogger{}
-	logger.SetUpRenzoFSCustomLogger()
+	logger := api.NewRenzoFSCustomLogger()
+	logger.OpenLogFile()
 }
 
 func main() {
@@ -25,8 +25,8 @@ func main() {
 	deleteDir := &api.DeleteDirPayLoad{}
 	createDir := &api.CreateDirPayLoad{}
 	fileInfo := &api.FileInfo{}
+	deletefile := &api.DeleteFilePayLoad{}
 	stats := &api.StatsPayload{}
-	deleteFile := &api.DeleteFilePayLoad{}
 
 	handle := http.NewServeMux()
 	handle.HandleFunc("/insert", insertion.HandleInsertion)
@@ -36,8 +36,8 @@ func main() {
 	handle.HandleFunc("/deletedir/", deleteDir.HandleDirElimination)
 	handle.HandleFunc("/createdir", createDir.HandleDirCreation)
 	handle.HandleFunc("/fileinfo/", fileInfo.HandleFileInfo)
+	handle.HandleFunc("/deletefile/", deletefile.HandleFileElimination)
 	handle.HandleFunc("/stats/", stats.HandleStats)
-	handle.HandleFunc("/deletefile/", deleteFile.HandleFileElimination)
 
 	http.ListenAndServe(":8080", handle)
 }

@@ -27,8 +27,6 @@ func (f *FileInfo) HandleFileInfo(w http.ResponseWriter, r *http.Request) {
 	f.fileName = tmpSlice[3]            // filename
 	f.dirName = tmpSlice[2]             // dirname
 
-	f.OpenLogFile()
-
 	if r.Method != http.MethodGet {
 		json, err := f.MarshalErrMessage("Method Not Valid")
 		if err != nil {

@@ -25,8 +25,6 @@ func (d *DeleteDirPayLoad) HandleDirElimination(w http.ResponseWriter, r *http.R
 	d.dirToDelete = tmp2[2]         // dirname
 	fmt.Printf("%v", d.dirToDelete)
 
-	d.OpenLogFile()
-
 	if r.Method != http.MethodDelete {
 		json, err := d.MarshalErrMessage("Method Not Allowed")
 		if err != nil {

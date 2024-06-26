@@ -21,8 +21,6 @@ type CreateDirPayLoad struct {
 }
 
 func (c *CreateDirPayLoad) HandleDirCreation(w http.ResponseWriter, r *http.Request) {
-	c.OpenLogFile()
-
 	if r.Method != http.MethodPost {
 		json, _ := c.MarshalErrMessage("Method Not Allowed")
 		handleCreateDirResponse(w, methodNotAllowed, json)
