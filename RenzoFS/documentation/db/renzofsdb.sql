@@ -12,3 +12,15 @@ CREATE TABLE users (
     username VARCHAR (50) UNIQUE NOT NULL,
     password VARCHAR (50) NOT NULL
 );
+
+CREATE TABLE folders (
+    folder_id BIGSERIAL PRIMARY KEY,
+    folder_name VARCHAR (50) UNIQUE NOT NULL,
+    user_id BIGINT NOT NULL,
+    CONSTRAINT fk_folders_users FOREIGN KEY(user_id)
+    REFERENCES users(user_id)
+);
+
+CREATE TABLE friends (
+    -- TODO
+);
