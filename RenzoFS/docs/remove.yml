@@ -1,0 +1,72 @@
+#
+# remove API documentation
+#
+
+info:
+  title: RenzoFS
+  version: 2024-05-09
+  
+servers:
+  -url: http://localhost/remove/{user}/{filename}?id=value&column=value
+
+paths:
+  /remove/{user}/{filename}?id=value&column=value:
+  delete:
+  summary: Remove the field specified in column key at the given row id
+  parameters:
+    - in: path
+      name: user
+      schema:
+        type: string 
+      required: true
+      description:  Directory name that containt the file in witch i want to get informations
+    - in: path
+      name: filename
+      schema:
+        type: string
+      required: true
+      description: Represent the file name in witch i want to get informations
+    - in: query
+      name: id
+      schema:
+        type: integer
+      required: true
+      description: row id in the file specified  
+    - in: query
+      name: column
+      schema:
+        type: string
+      required: true
+      description: Column name of the specified file
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              succ_message: 
+                type: string
+                example: Informations succesfully eliminated
+    '405':
+      description: Method Not Allowed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              err_message:
+                type: string
+                example: Method Not Allowed
+    '500':
+      description: Internal Server Error, when something went wrong in Backend, such as directory not found or json marshaling error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              err_message:
+                type: string
+                example: dir ... doesn't exist
+      

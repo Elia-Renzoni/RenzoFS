@@ -6,3 +6,9 @@
  */
 
 package renzofsapigateway
+
+import "net/http"
+
+type Idempotency struct {
+	requests map[]http.Request
+}

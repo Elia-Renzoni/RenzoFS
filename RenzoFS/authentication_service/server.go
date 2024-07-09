@@ -7,13 +7,13 @@ import (
 
 func main() {
 	router := http.NewServeMux()
-	login := &renzofs.Login{}
-	logout := &renzofs.Logout{}
+	signin := &renzofs.SignIn{}
+	signout := &renzofs.Signout{}
 	registry := &renzofs.DataSetRegistry{}
 	deregistry := &renzofs.DataSetDeregistry{}
 
-	router.HandleFunc("/login", login.HandleLogin)
-	router.HandleFunc("/logout", logout.HandleLogout)
+	router.HandleFunc("/signin", signin.HandleSignIn)
+	router.HandleFunc("/signout", signout.HandleSignout)
 	router.HandleFunc("/registry", registry.HandleRegistry)
 	router.HandleFunc("/deregistry/", deregistry.HandleDeregistry)
 
