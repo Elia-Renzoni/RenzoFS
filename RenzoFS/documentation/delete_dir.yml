@@ -1,0 +1,53 @@
+#
+# delete dir API documentation
+#
+
+info:
+  title: RenzoFS
+  version: 2024-05-09
+
+servers:
+  -url: http://localhost/deletedir/{user}
+
+path:
+  /deletedir/{user}:
+  delete:
+  summary: delete the specified directory 
+  parameters:
+    - in: path
+      name: user
+      schema:
+        type: string
+      required: true
+      description: directory name
+  responses:
+    '200':
+      description: OK
+      content: 
+        application/json:
+          schema:
+            type: object
+            properties:
+              succ_message:
+                type: string
+                example: ... has been deleted
+    '405':
+      description: Method Not Allowed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              err_message:
+                type: string
+                example: Method Not Allowed
+    '500':
+      description: Internal Server Error, when something went wrong in Backend, such as directory not found or json marshaling error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              err_message:
+                type: string
+                example: dir ... doesn't exist

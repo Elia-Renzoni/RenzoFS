@@ -8,19 +8,21 @@
 CREATE DATABASE renzofsdb;
 
 CREATE TABLE users (
-    user_id BIGSERIAL PRIMARY KEY,
-    username VARCHAR (50) UNIQUE NOT NULL,
+    username VARCHAR (50) PRIMARY KEY,
     password VARCHAR (50) NOT NULL
 );
 
 CREATE TABLE folders (
     folder_id BIGSERIAL PRIMARY KEY,
     folder_name VARCHAR (50) UNIQUE NOT NULL,
-    user_id BIGINT NOT NULL,
-    CONSTRAINT fk_folders_users FOREIGN KEY(user_id)
-    REFERENCES users(user_id)
+    username VARCHAR(50) NOT NULL,
+    FOREIGN KEY(username) REFERENCES users(username)
 );
 
 CREATE TABLE friends (
-    -- TODO
+    friendship_id BIGSERIAL PRIMARY KEY,
+    user1 VARCHAR(50) NOT NULL,
+    user2 VARCHAR(50) NOT NULL,
+    FOREIGN KEY (user1) REFERENCES users(username),
+    FOREIGN KEY (user2) REFERENCES users(username)
 );

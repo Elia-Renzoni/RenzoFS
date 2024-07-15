@@ -1,10 +1,23 @@
 package authservice
 
-import "net/http"
+import (
+	"database/sql"
+	"net/http"
+)
 
-type DeleteFriend struct {
+type DeleteFriendship struct {
+	user, friend string
+	db           *sql.DB
 }
 
-func (d *DeleteFriend) HandleFriendElimination(w http.ResponseWriter, r *http.Request) {
+func (d *DeleteFriendship) HandleFriendshipElimination(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (d *DeleteFriendship) openConnection(w http.ResponseWriter) {
+
+}
+
+func (d *DeleteFriendship) deleteStatement(w http.ResponseWriter) {
 
 }

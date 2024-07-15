@@ -1,0 +1,70 @@
+#
+# file info API documentation
+#
+
+info:
+  title: RenzoFS
+  version: 2024-05-08
+
+servers:
+  -url: http:localhost/fileinfo/{user}/{filename}
+
+paths:
+  /fileinfo/{user}/{filename}
+  get:
+    summary: Returns informations about the specified file
+    parameters:
+      - in: path
+        name: user
+        required: true
+        schema:
+          type: string
+        description: directory name
+      - in: path
+        name: filename
+        required: true
+        schema:
+          type: string
+        description: file's name on the given directory
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Name:
+                  type: string
+                  example: school.csv
+                Size:
+                  type: string
+                  example: 312
+                ModTime:
+                  type: string
+                  example: time and date
+      '405':
+        description: Method Not Allowed
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                err_message:
+                  type: string
+                  example: Method Not Allowed
+      '500':
+        description: Internal Server Error, when something went wrong in Backend, such as directory not found or json marshaling error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: 
+                err_message:
+                  type: string
+                  example: directory ... doesn't exist
+            
+
+
+
+
