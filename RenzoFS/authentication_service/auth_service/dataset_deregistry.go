@@ -28,15 +28,15 @@ func (d *DataSetDeregistry) HandleDeregistry(w http.ResponseWriter, r *http.Requ
 
 func (d *DataSetDeregistry) openConnection(w http.ResponseWriter) {
 	var err error
-	conn := "postgres://postgres:elia@localhost/renzofsdb?sslmode=disable"
+	conn := "postgres://elia:elia@localhost/renzofsdb?sslmode=disable"
 	d.db, err = sql.Open("postgres", conn)
 
 	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
+		http.Error(w, err.Error(), 500)
 	}
 
 	if err := d.db.Ping(); err != nil {
-		http.Error(w, "Ping Error", 500)
+		http.Error(w, err.Error(), 500)
 	}
 }
 
@@ -46,7 +46,7 @@ func (d *DataSetDeregistry) deleteStatement(w http.ResponseWriter) {
 	_, err := d.db.Exec(delete, d.username)
 
 	if err != nil {
-		http.Error(w, "Statement Error", 500)
+		http.Error(w, err.Error(), 500)
 	} else {
 		jsonMessage, err := json.Marshal(map[string]string{
 			"succ_message": "Folders Succesfully Deleted",

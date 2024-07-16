@@ -30,15 +30,15 @@ func (d *DataSetRegistry) HandleRegistry(w http.ResponseWriter, r *http.Request)
 
 func (d *DataSetRegistry) openConnection(w http.ResponseWriter) {
 	var err error
-	conn := "postgres://postgres:elia@localhost/renzofsdb?sslmode=disable"
+	conn := "postgres://elia:elia@localhost/renzofsdb?sslmode=disable"
 	d.db, err = sql.Open("postgres", conn)
 
 	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
+		http.Error(w, err.Error(), 500)
 	}
 
 	if err := d.db.Ping(); err != nil {
-		http.Error(w, "Ping Error", 500)
+		http.Error(w, err.Error(), 500)
 	}
 }
 
@@ -47,7 +47,7 @@ func (d *DataSetRegistry) insertStatement(w http.ResponseWriter) {
 	        		VALUES ($1, $2);`
 	_, err := d.db.Exec(insertion, d.folder, d.user)
 	if err != nil {
-		http.Error(w, "Statement Error", 500)
+		http.Error(w, err.Error(), 500)
 	} else {
 		jsonMessage, err := json.Marshal(map[string]string{
 			"succ_message": "folder succesfully added",

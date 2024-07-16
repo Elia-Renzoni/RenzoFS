@@ -30,7 +30,7 @@ func (s *SignIn) HandleSignIn(w http.ResponseWriter, r *http.Request) {
 
 func (s *SignIn) openConnection(w http.ResponseWriter) {
 	var err error
-	conn := "postgres://postgres:elia@localhost/renzofsdb?sslmode=disable"
+	conn := "postgres://elia:elia@localhost/renzofsdb?sslmode=disable"
 	s.db, err = sql.Open("postgres", conn)
 
 	if err != nil {
@@ -38,7 +38,7 @@ func (s *SignIn) openConnection(w http.ResponseWriter) {
 	}
 
 	if err := s.db.Ping(); err != nil {
-		http.Error(w, "Ping Error", 500)
+		http.Error(w, err.Error(), 500)
 	}
 }
 

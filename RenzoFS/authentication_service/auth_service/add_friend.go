@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+
+	_ "github.com/lib/pq"
 )
 
 type NewFriendship struct {
@@ -30,15 +32,15 @@ func (n *NewFriendship) HandleNewFriendship(w http.ResponseWriter, r *http.Reque
 
 func (n *NewFriendship) openConnection(w http.ResponseWriter) {
 	var err error
-	conn := "postgres://postgres:elia@localhost/renzofsdb?sslmode=disable"
+	conn := "postgres://elia:elia@localhost/renzofsdb?sslmode=disable"
 	n.db, err = sql.Open("postgres", conn)
 
 	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
+		http.Error(w, err.Error(), 500)
 	}
 
 	if err := n.db.Ping(); err != nil {
-		http.Error(w, "Ping Error", 500)
+		http.Error(w, err.Error(), 500)
 	}
 }
 
@@ -47,7 +49,7 @@ func (n *NewFriendship) insertStatement(w http.ResponseWriter) {
 				VALUES ($1, $2);`
 	_, err := n.db.Exec(insert, n.baseUser, n.friend)
 	if err != nil {
-		http.Error(w, "Statement Error", 500)
+		http.Error(w, err.Error(), 500)
 	} else {
 		jsonMessage, err := json.Marshal(map[string]string{
 			"succ_message": "Added new friend succesfully",

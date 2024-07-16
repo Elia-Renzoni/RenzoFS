@@ -49,7 +49,7 @@ func (so *Signout) deleteStatement(w http.ResponseWriter) {
 
 func (so *Signout) openConnection(w http.ResponseWriter) {
 	var err error
-	conn := "postgres://postgres:elia@localhost/renzofsdb?sslmode=disable"
+	conn := "postgres://elia:elia@localhost/renzofsdb?sslmode=disable"
 	so.db, err = sql.Open("postgres", conn)
 
 	if err != nil {
@@ -57,6 +57,6 @@ func (so *Signout) openConnection(w http.ResponseWriter) {
 	}
 
 	if err := so.db.Ping(); err != nil {
-		http.Error(w, "Ping Error", 500)
+		http.Error(w, err.Error(), 500)
 	}
 }
