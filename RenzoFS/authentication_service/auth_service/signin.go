@@ -8,8 +8,8 @@ import (
 )
 
 type SignIn struct {
-	username string `json:"username"`
-	password string `json:"password"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 	db       *sql.DB
 }
 
@@ -45,10 +45,11 @@ func (s *SignIn) openConnection(w http.ResponseWriter) {
 func (s *SignIn) insertStatement(w http.ResponseWriter) {
 	insert := `INSERT INTO users(username, password)
 	           VALUES ($1, $2);`
-	_, err := s.db.Exec(insert, s.username, s.password)
+	_, err := s.db.Exec(insert, s.Username, s.Password)
 
 	if err != nil {
-		http.Error(w, "Statement Error", 500)
+		http.Error(w, err.Error(), 500)
+
 	} else {
 		succResponse := map[string]string{
 			"succ_message": "Account Succesfully Created",

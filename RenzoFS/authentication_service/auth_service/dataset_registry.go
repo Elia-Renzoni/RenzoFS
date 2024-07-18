@@ -8,8 +8,8 @@ import (
 )
 
 type DataSetRegistry struct {
-	folder string `json:"new_folder"`
-	user   string `json:"user"`
+	Folder string `json:"new_folder"`
+	User   string `json:"user"`
 	db     *sql.DB
 }
 
@@ -45,7 +45,7 @@ func (d *DataSetRegistry) openConnection(w http.ResponseWriter) {
 func (d *DataSetRegistry) insertStatement(w http.ResponseWriter) {
 	insertion := `INSERT INTO folders(folder_name, username)
 	        		VALUES ($1, $2);`
-	_, err := d.db.Exec(insertion, d.folder, d.user)
+	_, err := d.db.Exec(insertion, d.Folder, d.User)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 	} else {

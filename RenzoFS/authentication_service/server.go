@@ -15,7 +15,7 @@ func main() {
 	deleteFriend := &renzofs.DeleteFriendship{}
 
 	router.HandleFunc("/signin", signin.HandleSignIn)
-	router.HandleFunc("/signout", signout.HandleSignout)
+	router.HandleFunc("/signout/", signout.HandleSignout)
 	router.HandleFunc("/registry", registry.HandleRegistry)
 	router.HandleFunc("/deregistry/", deregistry.HandleDeregistry)
 	router.HandleFunc("/newfriend", newFriend.HandleNewFriendship)
