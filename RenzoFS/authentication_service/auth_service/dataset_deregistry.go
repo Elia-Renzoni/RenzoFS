@@ -42,7 +42,7 @@ func (d *DataSetDeregistry) openConnection(w http.ResponseWriter) {
 
 func (d *DataSetDeregistry) deleteStatement(w http.ResponseWriter) {
 	delete := `DELETE FROM folders
-			   WHERE user_id = $1`
+			   WHERE username = $1`
 	_, err := d.db.Exec(delete, d.username)
 
 	if err != nil {

@@ -19,7 +19,7 @@ func main() {
 	router.HandleFunc("/registry", registry.HandleRegistry)
 	router.HandleFunc("/deregistry/", deregistry.HandleDeregistry)
 	router.HandleFunc("/newfriend", newFriend.HandleNewFriendship)
-	router.HandleFunc("/deletefriend", deleteFriend.HandleFriendshipElimination)
+	router.HandleFunc("/deletefriend/", deleteFriend.HandleFriendshipElimination)
 
 	http.ListenAndServe(":8082", router)
 }

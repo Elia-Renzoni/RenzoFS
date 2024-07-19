@@ -10,8 +10,8 @@ import (
 )
 
 type NewFriendship struct {
-	baseUser string `json:"first_user"`
-	friend   string `json:"second_user"`
+	BaseUser string `json:"first_user"`
+	Friend   string `json:"second_user"`
 	db       *sql.DB
 }
 
@@ -47,7 +47,7 @@ func (n *NewFriendship) openConnection(w http.ResponseWriter) {
 func (n *NewFriendship) insertStatement(w http.ResponseWriter) {
 	insert := `INSERT INTO friends(user1, user2)
 				VALUES ($1, $2);`
-	_, err := n.db.Exec(insert, n.baseUser, n.friend)
+	_, err := n.db.Exec(insert, n.BaseUser, n.Friend)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 	} else {
