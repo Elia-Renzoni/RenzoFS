@@ -3,9 +3,11 @@
 FROM golang:1.20
 
 # destination of the sources in the file system
-WORKDIR /DFSRemoteStorageService
+WORKDIR /RenzoFS
 
 COPY go.mod go.sum ./ 
+
+COPY /local_file_system ./
 
 RUN go mod download
 
