@@ -1,15 +1,21 @@
 package renzofsapigateway
 
 import (
+	"encoding/json"
+	"io"
 	"net/http"
-	"sync"
+	"net/url"
+	"os"
 	"time"
 )
 
 type ServiceDiscovery struct {
 	services []string
 	RenzoFSAPIGateway
-	mutex sync.Mutex
+}
+
+type HealthCheckRes struct {
+	PortName string `json:"port_name"`
 }
 
 func NewServiceDiscovery() ServiceDiscovery {
@@ -34,14 +40,46 @@ func (s *ServiceDiscovery) takeValuesAndTrim() {
 }
 
 func (s *ServiceDiscovery) Broadcast() {
-	for _, value := range s.services {
+	for _, microservice := range s.services {
 		go func(server string) {
-			var decodedRes string
+			encoded := &HealthCheckRes{}
 			client := &http.Client{
 				Timeout: 3 * time.Second,
 			}
 			response, err := client.Get(server)
-			// TODO
-		}(value)
+			if err != nil {
+				if os.IsTimeout(err) {
+					// devo cancellare subito il servizio
+					defer s.mutex.Unlock()
+					s.mutex.Lock()
+
+					for endpoint, microservice := range s.serverPool {
+						if microservice == server {
+							parsed, _ := url.Parse(microservice)
+							s.serverPool[endpoint] = string(parsed.Port())
+						}
+					}
+				}
+			} else {
+				defer s.mutex.Unlock()
+				s.mutex.Lock()
+
+				body, _ := io.ReadAll(response.Body)
+				json.Unmarshal(body, encoded)
+
+				for endpoint, microservice := range s.serverPool {
+					parsed, _ := url.Parse(microservice)
+					if parsed.Port() != encoded.PortName {
+						if microservice == encoded.PortName {
+							s.serverPool[endpoint] = server
+						}
+					} else {
+						// TODO
+
+					}
+				}
+
+			}
+		}(microservice)
 	}
 }

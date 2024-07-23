@@ -15,12 +15,14 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 )
 
 type RenzoFSAPIGateway struct {
 	host       string
 	listenPort string
 	serverPool map[string]string
+	mutex      sync.Mutex
 }
 
 // RenzoFS API endpoint

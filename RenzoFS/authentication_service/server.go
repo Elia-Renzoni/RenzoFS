@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	renzofs "renzofs/authentication_service/auth_service"
+	"time"
 )
 
 func main() {
@@ -13,6 +14,7 @@ func main() {
 	deregistry := &renzofs.DataSetDeregistry{}
 	newFriend := &renzofs.NewFriendship{}
 	deleteFriend := &renzofs.DeleteFriendship{}
+	health := &renzofs.HealthSystems{}
 
 	router.HandleFunc("/signin", signin.HandleSignIn)
 	router.HandleFunc("/signout/", signout.HandleSignout)
@@ -20,6 +22,15 @@ func main() {
 	router.HandleFunc("/deregistry/", deregistry.HandleDeregistry)
 	router.HandleFunc("/newfriend", newFriend.HandleNewFriendship)
 	router.HandleFunc("/deletefriend/", deleteFriend.HandleFriendshipElimination)
+	router.HandleFunc("/health", health.HandleHealthCheck)
 
-	http.ListenAndServe(":8082", router)
+	authServer := &http.Server{
+		Addr:              ":8082",
+		ReadTimeout:       3 * time.Second,
+		WriteTimeout:      3 * time.Second,
+		ReadHeaderTimeout: 3 * time.Second,
+		Handler:           router,
+	}
+
+	authServer.ListenAndServe()
 }

@@ -10,6 +10,7 @@ package main
 import (
 	"net/http"
 	"renzofs/remote_storage_service/api"
+	"time"
 )
 
 func init() {
@@ -27,6 +28,7 @@ func main() {
 	fileInfo := &api.FileInfo{}
 	deletefile := &api.DeleteFilePayLoad{}
 	stats := &api.StatsPayload{}
+	health := &api.HealthSystems{}
 
 	handle := http.NewServeMux()
 	handle.HandleFunc("/insert", insertion.HandleInsertion)
@@ -38,6 +40,15 @@ func main() {
 	handle.HandleFunc("/fileinfo/", fileInfo.HandleFileInfo)
 	handle.HandleFunc("/deletefile/", deletefile.HandleFileElimination)
 	handle.HandleFunc("/stats/", stats.HandleStats)
+	handle.HandleFunc("/health", health.HandleHealthCheck)
 
-	http.ListenAndServe(":8080", handle)
+	remoteSServer := &http.Server{
+		Addr:              ":8080",
+		ReadTimeout:       3 * time.Second,
+		WriteTimeout:      3 * time.Second,
+		ReadHeaderTimeout: 3 * time.Second,
+		Handler:           handle,
+	}
+
+	remoteSServer.ListenAndServe()
 }
