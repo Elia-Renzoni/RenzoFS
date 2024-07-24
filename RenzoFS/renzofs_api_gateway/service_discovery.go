@@ -2,11 +2,16 @@ package renzofsapigateway
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"time"
+)
+
+const (
+	port1, port2, port3 string = "8080", "8081", "8082"
 )
 
 type ServiceDiscovery struct {
@@ -28,58 +33,69 @@ func (s *ServiceDiscovery) takeValuesAndTrim() {
 		oldV string
 	)
 
-	for _, value := range s.serverPool {
+	for _, microservice := range s.serverPool {
 		if i != 0 {
-			if oldV != value {
-				s.services = append(s.services, value)
+			if oldV != microservice {
+				s.services = append(s.services, microservice)
 			}
 		}
-		oldV = value
+		oldV = microservice
 		i++
 	}
 }
 
 func (s *ServiceDiscovery) Broadcast() {
 	for _, microservice := range s.services {
-		go func(server string) {
-			encoded := &HealthCheckRes{}
-			client := &http.Client{
-				Timeout: 3 * time.Second,
+		go s.findMicroservices(microservice)
+	}
+}
+
+func (s *ServiceDiscovery) findMicroservices(server string) {
+	urlReq := fmt.Sprintf("%v/%v", server, "health")
+
+	for {
+		time.Sleep(5 * time.Second)
+
+		client := &http.Client{
+			Timeout: 3 * time.Second,
+		}
+		response, err := client.Get(urlReq)
+
+		s.mutex.Lock()
+		defer s.mutex.Unlock()
+
+		if err != nil {
+			if os.IsTimeout(err) {
+				s.deleteMicroservice(server)
 			}
-			response, err := client.Get(server)
-			if err != nil {
-				if os.IsTimeout(err) {
-					// devo cancellare subito il servizio
-					defer s.mutex.Unlock()
-					s.mutex.Lock()
+		} else {
+			s.addMicroservice(response, server)
+		}
+	}
+}
 
-					for endpoint, microservice := range s.serverPool {
-						if microservice == server {
-							parsed, _ := url.Parse(microservice)
-							s.serverPool[endpoint] = string(parsed.Port())
-						}
-					}
-				}
-			} else {
-				defer s.mutex.Unlock()
-				s.mutex.Lock()
+func (s *ServiceDiscovery) deleteMicroservice(server string) {
+	for endpoint, microservice := range s.serverPool {
+		if microservice == server {
+			parsed, _ := url.Parse(microservice)
+			s.serverPool[endpoint] = string(parsed.Port())
+		}
+	}
+}
 
-				body, _ := io.ReadAll(response.Body)
-				json.Unmarshal(body, encoded)
+func (s *ServiceDiscovery) addMicroservice(response *http.Response, server string) {
+	encoded := &HealthCheckRes{}
+	body, _ := io.ReadAll(response.Body)
+	json.Unmarshal(body, encoded)
 
-				for endpoint, microservice := range s.serverPool {
-					parsed, _ := url.Parse(microservice)
-					if parsed.Port() != encoded.PortName {
-						if microservice == encoded.PortName {
-							s.serverPool[endpoint] = server
-						}
-					} else {
-						// TODO
-
-					}
-				}
-
+	if response.StatusCode != http.StatusServiceUnavailable {
+		for endpoint, microservice := range s.serverPool {
+			switch microservice {
+			case port1, port2, port3:
+				s.serverPool[endpoint] = server
 			}
-		}(microservice)
+		}
+	} else {
+		s.deleteMicroservice(server)
 	}
 }
