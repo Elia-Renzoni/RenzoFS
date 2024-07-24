@@ -61,9 +61,6 @@ func (s *ServiceDiscovery) findMicroservices(server string) {
 		}
 		response, err := client.Get(urlReq)
 
-		s.mutex.Lock()
-		defer s.mutex.Unlock()
-
 		if err != nil {
 			if os.IsTimeout(err) {
 				s.deleteMicroservice(server)
@@ -75,6 +72,9 @@ func (s *ServiceDiscovery) findMicroservices(server string) {
 }
 
 func (s *ServiceDiscovery) deleteMicroservice(server string) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
 	for endpoint, microservice := range s.serverPool {
 		if microservice == server {
 			parsed, _ := url.Parse(microservice)
@@ -84,6 +84,9 @@ func (s *ServiceDiscovery) deleteMicroservice(server string) {
 }
 
 func (s *ServiceDiscovery) addMicroservice(response *http.Response, server string) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
 	encoded := &HealthCheckRes{}
 	body, _ := io.ReadAll(response.Body)
 	json.Unmarshal(body, encoded)
