@@ -1,9 +1,11 @@
 package api
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 type DeletePayLoad struct {
@@ -15,6 +17,9 @@ type DeletePayLoad struct {
 }
 
 func (d *DeletePayLoad) HandleDelete(w http.ResponseWriter, r *http.Request) {
+	_, cancel := context.WithTimeout(r.Context(), time.Second*5)
+	defer cancel()
+
 	tmp := r.URL.Path
 	tmp2 := strings.Split(tmp, "/")
 	d.user = tmp2[2]

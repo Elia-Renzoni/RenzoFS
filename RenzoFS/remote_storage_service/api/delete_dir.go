@@ -7,9 +7,11 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type DeleteDirPayLoad struct {
@@ -20,6 +22,9 @@ type DeleteDirPayLoad struct {
 }
 
 func (d *DeleteDirPayLoad) HandleDirElimination(w http.ResponseWriter, r *http.Request) {
+	_, cancel := context.WithTimeout(r.Context(), time.Second*5)
+	defer cancel()
+
 	tmp := r.URL.Path               // /deletedir/dirname
 	tmp2 := strings.Split(tmp, "/") // [deletedir, dirname]
 	d.dirToDelete = tmp2[2]         // dirname

@@ -1,9 +1,11 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type DeleteFilePayLoad struct {
@@ -14,6 +16,9 @@ type DeleteFilePayLoad struct {
 }
 
 func (df *DeleteFilePayLoad) HandleFileElimination(w http.ResponseWriter, r *http.Request) {
+	_, cancel := context.WithTimeout(r.Context(), time.Second*5)
+	defer cancel()
+
 	request := r.URL.Path
 	splittedRequest := strings.Split(request, "/")
 	df.dirname = splittedRequest[2]

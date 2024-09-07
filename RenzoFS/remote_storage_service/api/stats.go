@@ -1,8 +1,10 @@
 package api
 
 import (
+	"context"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type StatsPayload struct {
@@ -12,6 +14,9 @@ type StatsPayload struct {
 }
 
 func (s *StatsPayload) HandleStats(w http.ResponseWriter, r *http.Request) {
+	_, cancel := context.WithTimeout(r.Context(), time.Second*5)
+	defer cancel()
+
 	parameters := strings.Split(r.URL.Path, "/")
 	s.dirName = parameters[2]
 	s.fileName = parameters[3]

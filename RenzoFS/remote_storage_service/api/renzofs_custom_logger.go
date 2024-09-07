@@ -40,6 +40,9 @@ func (l *RenzoFSCustomLogger) OpenLogFile() {
 }
 
 func (l *RenzoFSCustomLogger) WriteInLogFile(message string) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
 	l.InfoLogger.Println(message)
 }
 

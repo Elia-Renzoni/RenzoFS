@@ -1,11 +1,13 @@
 package statistichandler
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
 	"path"
 	"strings"
+	"time"
 )
 
 type StatPayLoadstruct struct {
@@ -13,6 +15,9 @@ type StatPayLoadstruct struct {
 }
 
 func (s *StatPayLoadstruct) HandleRead(w http.ResponseWriter, r *http.Request) {
+	_, cancel := context.WithTimeout(r.Context(), time.Second*5)
+	defer cancel()
+
 	requestPath := r.URL.Path
 	splittedRequest := strings.Split(requestPath, "/")
 	s.dirname = splittedRequest[2]

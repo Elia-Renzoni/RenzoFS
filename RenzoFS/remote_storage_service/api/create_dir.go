@@ -7,10 +7,12 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 type CreateDirPayLoad struct {
@@ -21,6 +23,9 @@ type CreateDirPayLoad struct {
 }
 
 func (c *CreateDirPayLoad) HandleDirCreation(w http.ResponseWriter, r *http.Request) {
+	_, cancel := context.WithTimeout(r.Context(), time.Second*5)
+	defer cancel()
+
 	if r.Method != http.MethodPost {
 		json, _ := c.MarshalErrMessage("Method Not Allowed")
 		handleCreateDirResponse(w, methodNotAllowed, json)

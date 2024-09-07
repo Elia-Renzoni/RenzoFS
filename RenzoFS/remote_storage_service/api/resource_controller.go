@@ -115,6 +115,9 @@ func (r *ResourceController) WriteRemoteCSV(dir, filename, queryType string, que
 		lastChange  backToHomeDir = changeToMainDirectory
 	)
 
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
 	if queryType != insert {
 		return errors.New("Invalid Crud Operation")
 	}
@@ -210,6 +213,9 @@ func (r *ResourceController) UpdateRemoteCSV(dir, filename, queryType string, qu
 		idList              []string      = make([]string, 0)
 	)
 
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
 	if queryType != update {
 		return errors.New("Invalid Crud Operation")
 	}
@@ -297,6 +303,9 @@ func (r *ResourceController) DeleteRemoteCSV(dir, filename, queryType string, qu
 		emptyField          string        = "/"
 		storeControlResults []PairChecker = make([]PairChecker, 0)
 	)
+
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
 
 	if queryType != delete {
 		return errors.New("Invalid Crud Operation")

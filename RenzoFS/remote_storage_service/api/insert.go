@@ -7,9 +7,11 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
+	"time"
 )
 
 type InsertPayLoad struct {
@@ -37,6 +39,8 @@ type InsertPayLoad struct {
 // related to the insertion of new information to
 // the specified file
 func (i *InsertPayLoad) HandleInsertion(w http.ResponseWriter, r *http.Request) {
+	_, cancel := context.WithTimeout(r.Context(), time.Second*5)
+	defer cancel()
 
 	if r.Method != http.MethodPost {
 		json, err := i.MarshalErrMessage("Method Not Allowed")

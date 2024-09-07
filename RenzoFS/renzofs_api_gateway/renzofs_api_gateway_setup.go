@@ -9,7 +9,6 @@ package renzofsapigateway
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -138,7 +137,6 @@ func (re *RenzoFSAPIGateway) apiGatewayInnerHandler(w http.ResponseWriter, r *ht
 			service = parseURL(microservice)
 		}
 	default:
-		fmt.Printf("******")
 		handleAPIGatewayNegativeResponse(w, errors.New("Invalid Endpoint"))
 	}
 

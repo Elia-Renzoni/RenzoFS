@@ -8,9 +8,11 @@
 package api
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 type ReadPayLoad struct {
@@ -31,6 +33,9 @@ type ReadPayLoad struct {
 // access to the specified file and return
 // the content that match with the written id
 func (r *ReadPayLoad) HandleRead(w http.ResponseWriter, req *http.Request) {
+	_, cancel := context.WithTimeout(req.Context(), time.Second*5)
+	defer cancel()
+
 	tmp := req.URL.Path             // read/user/filename
 	tmp2 := strings.Split(tmp, "/") // [read, user, filename]
 	r.user = tmp2[2]                // user

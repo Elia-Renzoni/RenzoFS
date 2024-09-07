@@ -8,9 +8,11 @@
 package api
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type FileInfo struct {
@@ -22,6 +24,9 @@ type FileInfo struct {
 }
 
 func (f *FileInfo) HandleFileInfo(w http.ResponseWriter, r *http.Request) {
+	_, cancel := context.WithTimeout(r.Context(), time.Second*5)
+	defer cancel()
+
 	tmp := r.URL.Path                   // fileinfo/user/filename
 	tmpSlice := strings.Split(tmp, "/") // [fileinfo, user, filename]
 	f.fileName = tmpSlice[3]            // filename

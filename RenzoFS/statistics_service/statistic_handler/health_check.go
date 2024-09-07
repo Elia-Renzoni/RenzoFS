@@ -1,14 +1,19 @@
 package statistichandler
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 )
 
 type HealthSystems struct {
 }
 
 func (h *HealthSystems) HandleHealthCheck(w http.ResponseWriter, r *http.Request) {
+	_, cancel := context.WithTimeout(r.Context(), time.Second*5)
+	defer cancel()
+
 	if r.Method != http.MethodGet {
 		json, _ := json.Marshal(map[string]string{
 			"port_name": "Method Not Allowed",

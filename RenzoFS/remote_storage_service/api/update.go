@@ -1,9 +1,11 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
+	"time"
 )
 
 type UpdatePayLoad struct {
@@ -18,6 +20,9 @@ type UpdatePayLoad struct {
 }
 
 func (u *UpdatePayLoad) HandleUpdate(w http.ResponseWriter, r *http.Request) {
+	_, cancel := context.WithTimeout(r.Context(), time.Second*5)
+	defer cancel()
+
 	if r.Method != http.MethodPatch {
 		json, err := u.MarshalErrMessage("Method Not Allowed")
 		if err != nil {
